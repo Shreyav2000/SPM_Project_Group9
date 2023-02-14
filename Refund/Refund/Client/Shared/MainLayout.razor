@@ -1,0 +1,27 @@
+﻿@inherits LayoutComponentBase
+@using Radzen.Blazor
+@using Radzen.Blazor
+@inject NavigationManager UriHelper
+@inject IJSRuntime JSRuntime
+
+<RadzenDialog />
+<RadzenNotification />
+<RadzenTooltip />
+<RadzenContextMenu />
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="top-row px-4" id="mainHeader">
+        <a href="#" class="logo">
+            <img src="/images/logo.png" class="maintitleHead" />
+        </a>
+        <h1 class="mainTitle">KNUST MEDICAL REFUND SERVICE</h1>
+    </div>
+
+    <div class="content px-4">
+        @Body
+    </div>
+</div>

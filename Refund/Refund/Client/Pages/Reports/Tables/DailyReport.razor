@@ -1,0 +1,49 @@
+﻿@using BlazorTable
+@using KNUST_Medical_Refund.Shared.Models
+@using System.Globalization
+<hr />
+<div style="display:flex;justify-content:space-between;">
+    <p>
+        The total approved refund amount on <b>@(date.ToString("dd dddd MMMM, yyyy"))</b> is <b>@FormatAsUSD(data != null ? data.Sum(a => a.ApprovedAmount) : 0) </b>
+    </p>
+    @*<RadzenButton Text="Print Report" Style="background-color:green;" />*@
+</div>
+<Table TableItem="Request" Items="data" PageSize="15">
+    <Column TableItem="Request" Title="Request ID" Field="@(x => x.ReportID)" Sortable="true" Filterable="false" Width="10%" />
+    <Column TableItem="Request" Title="Client Name" Field="@(x => x.claimant.Fullname)" Sortable="true" Filterable="false" Width="20%" />
+    <Column TableItem="Request" Title="Requested Amount" Field="@(x => x.RequestedAmount)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @( FormatAsUSD(context.RequestedAmount))
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Approved Amount" Field="@(x => x.ApprovedAmount)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @( FormatAsUSD(context.ApprovedAmount))
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Status" Field="@(x => x.Status)" Sortable="true" Filterable="false" Width="5%" />
+    <Column TableItem="Request" Title="Request Date" Field="@(x => x.Request_date)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @(context.Request_date.ToString("dd-MM-yyyy"))
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Date Processed" Field="@(x => x.Date_processed)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @(context.Date_processed.HasValue ? context.Date_processed.Value.ToString("dd-MM-yyyy") : string.Empty)
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Processed By" Field="@(x => x.Vetter)" Sortable="true" Filterable="false" Width="10%" />
+    <Pager ShowPageNumber="true" ShowTotalCount="true" ShowPageSizes="true" />
+</Table>
+@code{
+    [Parameter]
+    public List<Request> data { get; set; }
+    [Parameter]
+    public DateTime date { get; set; }
+
+    string FormatAsUSD(object value)
+    {
+        string newvalue = ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+        return "GH¢ " + newvalue.Substring(1);
+    }
+}

@@ -1,0 +1,274 @@
+﻿@page "/pendingprotest"
+@inject HttpClient Http
+@using BlazorTable
+@using KNUST_Medical_Refund.Shared.Models
+@using Verification
+@using Protests
+@inject DialogService dialogService
+@using System.Globalization
+@using Newtonsoft.Json;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@using System.Text
+<div class="row" style="display:flex;justify-content:flex-start;">
+    <h3>Protested Refund Request Results</h3>
+    @*<center>
+        <RadzenDatePicker @bind-Value="selectedDate" TValue="DateTime" DateFormat="MMMM, yyyy" Change="getData" ShowTimeOkButton="true"></RadzenDatePicker>
+    </center>*@
+    @*<a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" href="#" style="visibility: hidden;"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>*@
+</div>
+<div class="row d-sm-flex justify-content-between align-items-center mb-4">
+    <div class="col-md-7">
+        <p style="color:#003445;"> @title </p>
+    </div>
+    <div class="col-md-5">
+        <RadzenSelectBar @bind-Value=@_singleValue TValue="bool" Change=@(args => OnChange())>
+            <Items>
+                <RadzenSelectBarItem Text="Pre-Processed" Value="true" />
+                <RadzenSelectBarItem Text="Unprocessed" Value="false" />
+            </Items>
+        </RadzenSelectBar>
+    </div>
+</div>
+
+<Table TableItem="Request" Items="data" PageSize="15" ColumnReorder="true" ShowSearchBar="true">
+    <Column TableItem="Request" Title="Protest ID" Field="@(x => x.protested.protestID)" Sortable="true" Filterable="false" Width="10%" />
+    <Column TableItem="Request" Title="Request ID" Field="@(x => x.ReportID)" Sortable="true" Filterable="false" Width="10%" />
+    <Column TableItem="Request" Title="Client Name" Field="@(x => x.claimant.Fullname)" Sortable="true" Filterable="false" Width="20%" />
+    <Column TableItem="Request" Title="Requested Amount" Field="@(x => x.RequestedAmount)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @( FormatAsUSD(context.RequestedAmount))
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Approved Amount" Field="@(x => x.ApprovedAmount)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @( FormatAsUSD(context.ApprovedAmount))
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Processed By" Field="@(x => x.Vetter)" Sortable="true" Filterable="false" Width="10%" />
+    <Column TableItem="Request" Title="Protest Date" Field="@(x => x.protested.dateprotested)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @(context.protested.dateprotested.Value.ToString("dd MMMM, yyyy"))
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Status" Field="@(x => x.protested.open)" Sortable="true" Filterable="false" Width="5%">
+        <Template>
+            @if (context.protested.open.HasValue && context.protested.open.Value)
+            {
+                <center>Open</center>
+            }
+            else
+            {
+                <center>Closed</center>
+            }
+        </Template>
+    </Column>
+
+    <Column TableItem="Request" Title="Actions" Width="20%">
+        <Template>
+            <center>
+                <RadzenButton Disabled="false" Text=@($"Settle") Click="@(args => ShowReview(context))" />
+            </center>
+        </Template>
+    </Column>
+    <Pager ShowPageNumber="true" ShowTotalCount="true" ShowPageSizes="true" />
+</Table>
+@if (IsVisible)
+{
+<div id="loading-div-background">
+    <div id="loading-div" class="ui-corner-all">
+        <div class="spinnermain-container">
+            <SpinKitCircle />
+        </div>
+        <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+    </div>
+</div>}
+@code {
+    private List<Request> data;
+    private List<Request> Preprocessed = new List<Request>();
+    private List<Request> Unprocessed = new List<Request>();
+    private List<Request> mainPending = new List<Request>();
+
+    public DateTime selectedDate;
+    protected bool IsVisible { get; set; }
+    private string title;
+    bool singleValue = true;
+
+    public AuthUser user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedDate = DateTime.Now;
+        title = "The following are protested refund requests which have been pre-processed by the system and are ready to be vetted";
+        string json = await sessionStorage.GetItemAsync<string>("userCred");
+        if (!String.IsNullOrEmpty(json))
+        {
+            user = JsonConvert.DeserializeObject<AuthUser>(json);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        await getData();
+    }
+
+    async Task getData()
+    {
+        ShowSpinner();
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/Protests/pending");
+
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+
+            using var httpResponse = await Http.SendAsync(request);
+
+            if (httpResponse.IsSuccessStatusCode)
+            {
+
+                mainPending = await httpResponse.Content.ReadFromJsonAsync<List<Request>>();
+
+                Preprocessed.Clear();
+                Unprocessed.Clear();
+                foreach (Request r in mainPending)
+                {
+                    if (r.protested.attachments.Any(d => d.parseID == null))
+                    {
+                        Unprocessed.Add(r);
+                    }
+                    else
+                    {
+                        Preprocessed.Add(r);
+                    }
+                }
+
+                if (singleValue)
+                {
+                    data = Preprocessed;
+                }
+                else
+                {
+                    data = Unprocessed;
+                }
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+        HideSpinner();
+    }
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    string FormatAsUSD(object value)
+    {
+        string newvalue = ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+        return "GH¢ " + newvalue.Substring(1);
+    }
+    protected override void OnInitialized()
+    {
+        dialogService.OnOpen += Open;
+        dialogService.OnClose += Close;
+    }
+
+    void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        StateHasChanged();
+    }
+    public void ShowSpinner()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void HideSpinner()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+    void Close(dynamic result)
+    {
+        StateHasChanged();
+    }
+    async Task ShowReview(Request request)
+    {
+        try
+        {
+            await loadAI(request);
+            bool result = await dialogService.OpenAsync<ProtestVetting>($"Refund Protest Review",
+              new Dictionary<string, object>() { { "Requested", request } },
+              new DialogOptions() { Width = "800px", Height = "800px", ShowClose = true });
+            if (result)
+            {
+                data.Remove(request);
+                StateHasChanged();
+            }
+        }
+        catch { }
+    }
+
+    private async Task loadAI(Request requestSub)
+    {
+        events.Clear();
+        ShowSpinner();
+
+        if (!singleValue)
+        {
+
+            Request postBody = new Request();
+            postBody.ReportID = requestSub.protested.protestID;
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/parsedocuments");
+
+            request.Content = new StringContent(JsonConvert.SerializeObject(postBody), Encoding.UTF8, "application/json");
+
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var requestSupport = new HttpRequestMessage(HttpMethod.Get, "api/SupportDocuments/" + requestSub.protested.protestID);
+                requestSupport.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+                using var httpResponse = await Http.SendAsync(requestSupport);
+                requestSub.protested.attachments = await httpResponse.Content.ReadFromJsonAsync<List<SupportDocument>>();
+            }
+        }
+        HideSpinner();
+    }
+
+    public bool _singleValue
+    {
+        get { return singleValue; }
+        set
+        {
+            singleValue = value;
+            if (singleValue)
+            {
+                data = Preprocessed;
+            }
+            else
+            {
+                data = Unprocessed;
+            }
+            StateHasChanged();
+        }
+    }
+
+    void OnChange()
+    {
+        if (singleValue)
+        {
+            title = "The following are protested refund requests which have been pre-processed by the system and are ready to be vetted";
+        }
+        else
+        {
+            title = "The following are protested refund requests which have not yet been processed by the system to start vetting an unprocessed \n request please" +
+                    " wait for a short moment for the system to complete the required checks";
+        }
+
+    }
+}

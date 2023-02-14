@@ -1,0 +1,129 @@
+is_global = true
+build_property.TargetFramework = net7.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = Refund.Client
+build_property.RootNamespace = Refund.Client
+build_property.ProjectDir = C:\Users\barhen\source\repos\Refund\Refund\Client\
+build_property.RazorLangVersion = 7.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\barhen\source\repos\Refund\Refund\Client
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Admin/Approved.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQXBwcm92ZWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Other Users/ApprovedSub.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3RoZXIgVXNlcnNcQXBwcm92ZWRTdWIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Pending.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGVuZGluZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Protests/DocumentsDispute.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvdGVzdHNcRG9jdW1lbnRzRGlzcHV0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Protests/DocumentsDisputeReview.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvdGVzdHNcRG9jdW1lbnRzRGlzcHV0ZVJldmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Protests/PendingProtest.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvdGVzdHNcUGVuZGluZ1Byb3Rlc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Protests/ProcessedProtests.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvdGVzdHNcUHJvY2Vzc2VkUHJvdGVzdHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Protests/ProtestReview.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvdGVzdHNcUHJvdGVzdFJldmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Protests/ProtestVetting.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvdGVzdHNcUHJvdGVzdFZldHRpbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Reports/Graphical.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xHcmFwaGljYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Reports/Lists.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xMaXN0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Reports/ReportMain.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xSZXBvcnRNYWluLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Reports/Tables/DailyReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xUYWJsZXNcRGFpbHlSZXBvcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Reports/Tables/MonthlyReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xUYWJsZXNcTW9udGhseVJlcG9ydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Reports/Tables/PeriodicAll.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xUYWJsZXNcUGVyaW9kaWNBbGwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Verification/Documents.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmVyaWZpY2F0aW9uXERvY3VtZW50cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Verification/DocumentsReview.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmVyaWZpY2F0aW9uXERvY3VtZW50c1Jldmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Verification/Review.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmVyaWZpY2F0aW9uXFJldmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Verification/Transcribed.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmVyaWZpY2F0aW9uXFRyYW5zY3JpYmVkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Pages/Verification/Vetting.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVmVyaWZpY2F0aW9uXFZldHRpbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Shared/LoginLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExvZ2luTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-m13e6389ck
+
+[C:/Users/barhen/source/repos/Refund/Refund/Client/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-tgg3xwf29v

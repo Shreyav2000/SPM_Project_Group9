@@ -1,0 +1,491 @@
+﻿@page "/supportReview/{documents}/{documentTypes}/{route}/{frequencies}/{units}/{checks}"
+@inject HttpClient Http
+@using KNUST_Medical_Refund.Shared.Models
+@inject DialogService dialogService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@inject TooltipService tooltipService
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@using Newtonsoft.Json
+
+
+@if (documents.Count > 1)
+{
+    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+        <RadzenButton Click="@previousDocument" Text="Previous" Style="margin-bottom: 10px; width: 150px;background-color:#007bff;" />
+        <p style="color:#003445;"> <b>@(selectedIndex + 1)</b>  out of <b>@documents.Count</b> documents </p>
+        <RadzenButton Click="@nextDocument" Text="Next" Style="margin-bottom: 10px; width: 150px;background-color:#079737;" />
+    </div>
+}
+<RadzenCard>
+    <div class="row">
+        <div class="col-md-6">
+            <h6> Document Details (AS entered by claimant)</h6>
+            <hr />
+            <div>Institution Name:</div>
+            <b>
+                @{
+                    institution = documents[selectedIndex].companyName;
+                    @institution
+                }
+            </b>
+            <div>Document Type :</div>
+            <b>
+                @{
+                    documentType = documents[selectedIndex].documentType;
+                    @documentType
+                }
+            </b>
+            <div>Document ID:</div>
+            <b>
+                @{
+                    documentID = documents[selectedIndex].documentID;
+                    @documentID
+                }
+            </b>
+            @if (documents[selectedIndex].amount.HasValue)
+            {
+                <div>Amount :</div>
+                <b>
+                    @{
+                        amount = documents[selectedIndex].amount.ToString();
+                        @("GH¢ " + amount)
+                    }
+                </b>
+            }
+            <div>Date Issue:</div>
+            <b>
+                @{
+                    documentDate = documents[selectedIndex].date.ToString("yyyy-MM-dd");
+                    @DateTime.Parse(documentDate).ToLongDateString()
+                }
+            </b>
+            <div>Client's Name:</div>
+            <b>
+                @{
+                    recipientName = documents[selectedIndex].clientName;
+                    @recipientName
+                }
+            </b>
+            <br />
+            <hr />
+            <div style="height:30px;background-color:#003445;padding:20px;color:white;margin-top:10px;">
+                <h6> Advisor</h6>
+            </div>
+            <RadzenCard Style="width:100%; height:300px;overflow: auto;">
+                @if (IsVisible)
+                {
+                    <div class="spinner-container">
+                        <SpinKitCircle />
+                    </div>
+                }
+                @for (int i = 1; i <= events.Count; i++)
+                {
+                    <p>@(i.ToString() + ") " + events[i - 1])</p>
+                    <br />
+                }
+            </RadzenCard>
+        </div>
+        <div class="col-md-6">
+            <div class="row" style="display:flex;justify-content:space-between;">
+                <h6> Document (AS uploaded by claimant)</h6>
+                @if (documents[selectedIndex].documentType == "Prescription Form")
+                {
+                    <div style="display:flex;justify-content:center;">
+                        <RadzenButton Text="Show Transcribed Prescription" Style="background-color:#003445;" Click="showTranscription" />
+                    </div>
+                }
+            </div>
+            <hr />
+            @{
+                string image = "api/imagepuller/filter?filename=" + documents[selectedIndex].attachment;
+                <RadzenCard Style="width:100%;height:90%;">
+                    <RadzenImage Path="@image" Click="@(() => ShowInlineDialog(image))" Style="max-width: 100%; max-height: 100%;cursor:pointer;"> </RadzenImage>
+                </RadzenCard>
+            }
+        </div>
+    </div>
+</RadzenCard>
+<RadzenFieldset Text="Official Use" Style="margin-top:50px;">
+    <div class="row">
+        <div class="align-items-center d-flex col-md-4">
+            <RadzenLabel Text="Document Type" />
+        </div>
+        <div class="col-md-8">
+            <RadzenRadioButtonList Disabled="true" @bind-Value=@nullableValue TValue="string">
+                <Items>
+                    @foreach (DocumentType doc in documentTypes)
+                    {
+                        <RadzenRadioButtonListItem Disabled="true" Text="@doc.TypeName" Value="@doc.TypeCode" />
+                    }
+                </Items>
+            </RadzenRadioButtonList>
+        </div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+        <div class="align-items-center d-flex col-md-4">
+            <RadzenLabel Text="Drugs / Investigation :" />
+        </div>
+        <div class="col-md-8" style="margin-top:10px;">
+
+            <RadzenCheckBox Disabled="true" @bind-Value="nhiscovered" TValue="bool" Name="Checkbox0" Change="@changeNHIS" /><RadzenLabel Text="NHIS Covered" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+            <RadzenCheckBox Disabled="true" @bind-Value="notcovered" TValue="bool" Name="Checkbox0" Change="@notchangeNHIS" /><RadzenLabel Text="NHIS not covered" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="align-items-center d-flex col-md-4">
+            <RadzenLabel Text="Date on document" />
+        </div>
+        <div class="col-md-6">
+            <RadzenDatePicker Disabled="true" style="width: 300px;" DateFormat="dddd, dd MMMM yyyy" @bind-Value="dateOndocument" />
+        </div>
+    </div>
+
+    <div class="row" style="margin-bottom:10px;">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Cost Comparable with market price :" />
+        </div>
+        <div class="col-md-4">
+            <RadzenCheckBox Disabled="true" @bind-Value="marketPrice" TValue="bool" Change="changeMarket" /><RadzenLabel Text="Yes" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+            <RadzenCheckBox Disabled="true" @bind-Value="nomarketPrice" TValue="bool" Change="notchangeMarket" /><RadzenLabel Text="No" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom:10px;">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Satisfy all requirements :" />
+        </div>
+        <div class="col-md-6">
+            <RadzenCheckBox Disabled="true" @bind-Value="satisfied" TValue="bool" Change="@satisfactionChange1" /><RadzenLabel Text="Yes" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+            <RadzenCheckBox Disabled="true" @bind-Value="unsatisfied" TValue="bool" Change="@satisfactionChange2" /><RadzenLabel Text="No" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+            <RadzenCheckBox Disabled="true" @bind-Value="partiallysatisfied" TValue="bool" Change="@satisfactionChange3" /><RadzenLabel Text="Partially" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="align-items-center d-flex col-md-4">
+            <RadzenLabel Text="Amount approved" />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="GH¢ " />
+            <RadzenNumeric Disabled="true" Style="width: 80%;" Name="Amount" @bind-Value="approvedAmount" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Comments : " /> <b></b>
+        </div>
+        <div class="col-md-8">
+            <RadzenTextArea Disabled="true" @bind-Value="@approvalRemarks" Cols="70" Rows="6" Style="margin-bottom: 20px;margin-top:20px;" />
+        </div>
+    </div>
+</RadzenFieldset>
+<center>
+    @if (documents[selectedIndex].vetState.HasValue && documents[selectedIndex].vetState.Value)
+    {
+        <b> <RadzenLabel Text="APPROVED" Style="color:#079737;font-size: xx-large;" /> </b>
+    }
+    else if (documents[selectedIndex].vetState.HasValue && !documents[selectedIndex].vetState.Value)
+    {
+        <b> <RadzenLabel Text="DECLINED" Style="color:crimson;font-size: xx-large;" /> </b>
+    }
+</center>
+<div class="row">
+    <div class="col-md-12">
+        <center>
+            <RadzenButton Click="@(() => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+        </center>
+    </div>
+</div>
+@if (IsVisible)
+{
+    <div id="loading-div-background">
+        <div id="loading-div" class="ui-corner-all">
+            <div class="spinnermain-container">
+                <SpinKitCircle />
+            </div>
+            <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+        </div>
+    </div>}
+@code {
+    [Parameter]
+    public List<SupportDocument> documents { get; set; }
+    [Parameter]
+    public List<DocumentType> documentTypes { get; set; }
+    [Parameter]
+    public List<DrugPrescriptionFrequency> frequencies { get; set; }
+    [Parameter]
+    public List<DrugRouteOfAdministration> route { get; set; }
+    [Parameter]
+    public List<DrugUsageForm> units { get; set; }
+    [Parameter]
+    public List<RefundSupportDocumentCheck> checks { get; set; }
+
+    public string institution, documentType, documentID, amount, documentDate, recipientName, requestID, documentGUID;
+    public string parseID, oldparse;
+    public bool singleValue;
+    List<string> events = new List<string>();
+    public int number;
+    NotificationMessage notificationMessage = new NotificationMessage();
+
+    public bool approved, marketPrice, nomarketPrice;
+    public bool nhiscovered, notcovered, satisfied, unsatisfied, partiallysatisfied;
+    public string selectItem = "", approvalRemarks;
+    public double approvedAmount;
+    public DateTime dateOndocument;
+    public AuthUser user;
+    public int selectedIndex = 0;
+
+    public int satisfaction;
+    int value = 1;
+    public string nullableValue;
+
+    protected bool IsVisible { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        SpinnerService.OnShow += ShowSpinner;
+        SpinnerService.OnHide += HideSpinner;
+        string json = await sessionStorage.GetItemAsync<string>("userCred");
+        if (!String.IsNullOrEmpty(json))
+        {
+            user = JsonConvert.DeserializeObject<AuthUser>(json);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+
+        loadAI(documents[selectedIndex].documentGUID);
+    }
+    void loadAI(string id)
+    {
+        try
+        {
+            events.Clear();
+            ShowSpinner();
+
+            foreach (RefundSupportDocumentCheck check in checks.Where(d => d.DocumentGuid == id))
+            {
+                events.Add(check.Notes);
+            }
+            if (events.Count < 1)
+                events.Add("Nothing to show at this moment");
+            events.Add("Please examine the document closely by clicking on the document zoom in");
+
+            getVetted();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+        HideSpinner();
+    }
+    public void ShowSpinner()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+    public void HideSpinner()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+    void supportChange()
+    {
+        StateHasChanged();
+    }
+    void changeMarket()
+    {
+        if (marketPrice)
+        {
+            nomarketPrice = false;
+        }
+        else
+        {
+            marketPrice = false;
+        }
+    }
+    void notchangeMarket()
+    {
+        if (nomarketPrice)
+        {
+            marketPrice = false;
+        }
+        else
+        {
+            nomarketPrice = false;
+        }
+    }
+    void satisfactionChange1()
+    {
+        if (satisfied)
+        {
+            unsatisfied = false;
+            partiallysatisfied = false;
+            satisfaction = 1;
+        }
+        else
+        {
+            satisfied = false;
+            satisfaction = 0;
+        }
+    }
+    void satisfactionChange2()
+    {
+        if (unsatisfied)
+        {
+            satisfied = false;
+            partiallysatisfied = false;
+            satisfaction = 2;
+        }
+        else
+        {
+            satisfaction = 0;
+            unsatisfied = false;
+        }
+    }
+    void satisfactionChange3()
+    {
+        if (partiallysatisfied)
+        {
+            unsatisfied = false;
+            satisfied = false;
+            satisfaction = 3;
+        }
+        else
+        {
+            partiallysatisfied = false;
+            satisfaction = 0;
+        }
+    }
+    void changeNHIS()
+    {
+        if (nhiscovered)
+        {
+            notcovered = false;
+        }
+        else
+        {
+            nhiscovered = false;
+        }
+    }
+    void notchangeNHIS()
+    {
+        if (notcovered)
+        {
+            nhiscovered = false;
+        }
+        else
+        {
+            notcovered = false;
+        }
+    }
+    void nextDocument()
+    {
+        if (selectedIndex < documents.Count - 1)
+        {
+            selectedIndex++;
+
+            events.Clear();
+            documentGUID = documents[selectedIndex].documentGUID;
+            requestID = documents[selectedIndex].reportID;
+            parseID = documents[selectedIndex].parseID;
+            loadAI(documentGUID);
+
+        }
+    }
+    void previousDocument()
+    {
+        if(selectedIndex > 0)
+        {
+            selectedIndex--;
+
+            events.Clear();
+
+            documentGUID = documents[selectedIndex].documentGUID;
+            requestID = documents[selectedIndex].reportID;
+            parseID = documents[selectedIndex].parseID;
+
+            loadAI(documentGUID);
+        }
+    }
+    async Task ShowInlineDialog(string path) => await dialogService.OpenAsync("", ds =>
+    @<div>
+        <WheelZoom Image="@path" width="100%;" height="100%;" />
+    </div>);
+void getVetted()
+{
+  VettedDocument d = documents.Where(r => r.documentGUID == documents[selectedIndex].documentGUID).Select(rp => rp.vetting).First();
+  if (d != null)
+  {
+      nullableValue = d.DocumentType;
+      approvedAmount = double.Parse(d.AmountApproved.Value.ToString());
+      approvalRemarks = d.Comments;
+      dateOndocument = d.DocumentDate.Value;
+
+
+      if (d.NhisCovered.Value)
+      {
+          nhiscovered = true;
+          notcovered = false;
+      }
+      else
+      {
+          nhiscovered = false;
+          notcovered = true;
+      }
+
+      if (d.ComparableMarket.Value)
+      {
+          marketPrice = true;
+          nomarketPrice = false;
+      }
+      else
+      {
+          marketPrice = false;
+          nomarketPrice = true;
+      }
+
+      switch (d.Satisfy.Value)
+      {
+          case 1:
+              satisfied = true;
+              satisfactionChange1();
+              break;
+          case 2:
+              unsatisfied = true;
+              satisfactionChange2();
+              break;
+          case 3:
+              partiallysatisfied = true;
+              satisfactionChange3();
+              break;
+      }
+  }
+  else
+  {
+      satisfaction = 404;
+      nullableValue = null;
+      approvalRemarks = null;
+      nhiscovered = false;
+      notcovered = false;
+      dateOndocument = DateTime.Now;
+      approvedAmount = 0;
+      approvalRemarks = "";
+      marketPrice = false;
+      nomarketPrice = false;
+  }
+}
+async Task showTranscription()
+{
+  await dialogService.OpenAsync<Transcribed>($"",
+               new Dictionary<string, object>() {
+                      {"documentGUID", documents[selectedIndex].documentGUID},
+                      {"units",units},
+                      {"frequencies",frequencies},
+                      {"route",route},
+                                                                 },
+               new DialogOptions() { Width = "1200px", Height = "780px", ShowClose = true });
+}
+}

@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="Pages\Index.razor" />
+	  <None Include="Shared\MainLayout.razor" />
+	  <None Include="Shared\NavMenu.razor" />
+	  <None Include="Shared\SurveyPrompt.razor" />
+	  <None Include="wwwroot\css\bootstrap\bootstrap.min.css.map" />
+	  <None Include="wwwroot\css\open-iconic\FONT-LICENSE" />
+	  <None Include="wwwroot\css\open-iconic\font\fonts\open-iconic.svg" />
+	  <None Include="wwwroot\css\open-iconic\ICON-LICENSE" />
+	  <None Include="wwwroot\css\open-iconic\README.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.2" PrivateAssets="all" />
+		<PackageReference Include="Blazored.SessionStorage" Version="1.0.12" />
+		<PackageReference Include="BlazorTable" Version="1.14.0" />
+		<PackageReference Include="Faso.Blazor.SpinKit" Version="1.0.1" />
+		<PackageReference Include="iso8859.blazor.wheel-zoom" Version="1.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+		<PackageReference Include="Radzen.Blazor" Version="2.18.6" />
+		<PackageReference Include="RestSharp" Version="106.11.7" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+		<PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Shared\Refund.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+	</ItemGroup>
+
+</Project>

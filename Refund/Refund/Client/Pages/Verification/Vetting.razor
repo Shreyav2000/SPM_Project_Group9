@@ -1,0 +1,523 @@
+﻿@page "/Verification/vet/{Requested}"
+@inject HttpClient Http
+@using KNUST_Medical_Refund.Shared.Models
+@inject DialogService dialogService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@inject TooltipService tooltipService
+@inject NotificationService notificationService
+@using Newtonsoft.Json;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@using System.Text 
+
+
+<RadzenCard Style="margin-bottom: 20px;">
+    @if (IsVisible)
+    {
+<div id="loading-div-background">
+    <div id="loading-div" class="ui-corner-all">
+        <div class="spinnermain-container">
+            <SpinKitCircle />
+        </div>
+        <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+    </div>
+</div>}
+    <div class="row">
+        <RadzenFieldset Text="Claimant's Info" Style="width:100%;">
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Name of Claimant" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cFullname" @bind-Value="requested.claimant.Fullname" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Department" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cDept" @bind-Value="requested.claimant.Department" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Claimant's ID Number" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cID" @bind-Value="requested.claimant.Knustid" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Telephone" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cTel" @bind-Value="requested.claimant.Telephone" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Age" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenNumeric Disabled="true" style="width: 100%;" Name="cAge" @bind-Value="requested.claimant.Age" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Folder/ID Card Number" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cFolder" @bind-Value="requested.claimant.HospitalNo" />
+                </div>
+            </div>
+
+        </RadzenFieldset>
+        <RadzenFieldset Text="Request Info" Style="width:100%;">
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Request Date" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenDatePicker style="width: 100%;" Name="RequestDate" @bind-Value="requested.Request_date" Disabled="true" DateFormat="dddd, dd MMMM yyyy HH:mm:ss" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Refund for" />
+                </div>
+                <div class="col-md-8">
+                    <div style="margin-top:10px;">
+                        @if (requested.BeneficiaryType.ToLower() == "staff")
+                        {
+                            <RadzenCheckBox Value="true" Disabled="true" /><RadzenLabel Text="    Staff" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Dependent" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Student" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Pensioner" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                        }
+                        else if (requested.BeneficiaryType.ToLower() == "dependent")
+                        {
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="     Staff" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="true" Disabled="true" /><RadzenLabel Text="    Dependent" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="   Student" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Pensioner" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                        }
+                        else if (requested.BeneficiaryType.ToLower() == "student")
+                        {
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Staff" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Dependent" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="true" Disabled="true" /><RadzenLabel Text="    Student" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Pensioner" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                        }
+                        else
+                        {
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Staff" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="    Dependent" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="   Student" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                            <RadzenCheckBox Value="true" Disabled="true" /><RadzenLabel Text="    Pensioner" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                        }
+                    </div>
+                </div>
+            </div>
+            @if (requested.BeneficiaryType.ToLower() == "dependent")
+            {
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Name Of Dependent : " /> <b></b>
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextBox Disabled="true" style="width: 100%;" @bind-Value="requested.Beneficiary.BeneficiaryFullname" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenLabel Text=@("Age : " + requested.Beneficiary.BeneficiaryAge.ToString()) />
+                    </div>
+                </div>
+            }
+            else if (requested.BeneficiaryType.ToLower() == "staff")
+            {
+                <div class="row" style="margin-top:10px;">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Staff Category : " Style="font-size: 16px;" /> <b></b>
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenLabel Text="@(staffCategory.Where(c => c.Id == requested.BeneficiaryCategory).Select(c=>c.StaffCategory).FirstOrDefault())" Style="font-weight: bold;font-size: 16px;" /> <b></b>
+                    </div>
+                </div>
+            }
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="NHIS Holder" />
+                </div>
+                <div class="col-md-8">
+                    @if (!String.IsNullOrEmpty(requested.Beneficiary.Nhisnumber))
+                    {
+                        <RadzenCheckBox Value="true" Disabled="true" /><RadzenLabel Text="Yes" Style="margin-left: 5px;margin-right: 5px;margin-bottom: 20px" Component="CheckBox3" />
+                        <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="No" Style="margin-left: 5px;margin-right: 5px;margin-bottom: 20px" Component="CheckBox3" />
+                    }
+                    else
+                    {
+                        <RadzenCheckBox Value="false" Disabled="true" /><RadzenLabel Text="Yes" Style="margin-left: 5px;margin-right: 5px;margin-bottom: 20px" Component="CheckBox3" />
+                        <RadzenCheckBox Value="true" Disabled="true" /><RadzenLabel Text="No" Style="margin-left: 5px;margin-right: 5px;margin-bottom: 20px" Component="CheckBox3" />
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Hospital Attended : " /> <b></b>
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox Disabled="true" style="width: 100%;" @bind-Value="requested.HospitalAttended" />
+                </div>
+            </div>
+
+            @if (requested.HospitalAttended.ToLower() != "knust uhs")
+            {
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Reason for not attending KNUST Hospital " /> <b></b>
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextArea Disabled="true" @bind-Value="@requested.Reason" Cols="50" Rows="3" Style="margin-bottom: 20px;margin-top:20px;" />
+                    </div>
+                </div>
+
+            }
+
+
+            @if (requested.DatesAttended.Count() > 1)
+            {
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Dates Attended Hospital" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenCard Style="width:100%; height:auto;overflow: auto;">
+                            @for (int i = 1; i <= requested.DatesAttended.Count; i++)
+                            {
+                                @(i.ToString() + ") " + requested.DatesAttended[i - 1].ToLongDateString());
+                                <br />
+                            }
+                        </RadzenCard>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Date Attended Hospital" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenLabel Text=@requested.DatesAttended[0].ToLongDateString() />
+                    </div>
+                </div>
+            }
+            <div class="row" style="margin-top:20px;">
+                <div class="align-items-center d-flex col-md-6">
+                    <RadzenLabel Text="Amount being claimed : " />
+                </div>
+                <div class="col-md-4">
+                    <b><RadzenLabel Text=@( "GH¢ " + (requested.RequestedAmount)) /></b>
+                </div>
+            </div>
+            <div class=".ui-fieldset-legend" style="margin:5px;">
+                <p style="color:#003445 !important;"> Select any of the refund items below to reveal its supporting documents.</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Refund on account for" /> <b></b>
+                </div>
+                <div class="col-md-8">
+                    <RadzenCard Style="max-width:100%; max-height:154.47px;overflow: auto;">
+                        @foreach (string item in requested.RefundItems.Select(i => i.item).Distinct().ToList())
+                        {
+                            if (processedItems.Contains(item))
+                            {
+                                <div class="processed d-sm-flex justify-content-between align-items-center">
+                                    <p class="">@(item)</p>
+
+                                    <RadzenButton Text="Show Documents" Click="@(args =>
+                                               {
+                                                   ShowReview(requested.RefundItems.Where(i => i.item == item).ToList());
+                                               })" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class=" refundList d-sm-flex justify-content-between align-items-center">
+                                    <p class="">@(item)</p>
+                                    <RadzenButton Text="Show Documents" Click="@(args =>
+                                               {
+                                                   ShowReview(requested.RefundItems.Where(i => i.item == item).ToList());
+                                               })" />
+                                </div>
+                            }
+                            <hr style="margin-top:2px;margin-bottom:10px;" />
+                        }
+                    </RadzenCard>
+                    @*<RadzenListBox TValue="string" Data="@(requested.RefundItems.Select(i => i.item).Distinct().ToList())" Change="
+                @bind-Value="@selectItem" Style="height:100%;width:100%;" MouseEnter="@(args => ShowTooltip(args, new TooltipOptions(){ Duration = 5000 }))" />*@
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:20px;">
+                <div class="align-items-center d-flex col-md-6">
+                    <RadzenLabel Text="Total Amount Approved : " />
+                </div>
+                <div class="col-md-4">
+                    <b><RadzenLabel Text=@( "GH¢ " +approvedAmount) /></b>
+                </div>
+            </div>
+        </RadzenFieldset>
+    </div>
+</RadzenCard>
+<center>
+    <RadzenButton Text="Submit" Click="@(async () => await confirmVetting())" Style="margin-bottom: 10px; width: 150px" />
+</center>
+@code {
+    [Parameter]
+    public Request requested { get; set; }
+
+    private Request[] data;
+    public AuthUser user = new AuthUser();
+    NotificationMessage notificationMessage = new NotificationMessage();
+    //    TblProcessedRefund vetted;
+
+    public SortedList<string, double> approvals = new SortedList<string, double>();
+    public List<string> processedItems;
+
+    public double approvedAmount;
+    protected bool IsVisible { get; set; }
+
+    public List<DocumentType> documentTypes = new List<DocumentType>();
+    public List<Category> staffCategory = new List<Category>();
+    public List<DrugPrescriptionFrequency> frequencies { get; set; }
+    public List<DrugRouteOfAdministration> route { get; set; }
+    public List<DrugUsageForm> units { get; set; }
+    public List<RefundSupportDocumentCheck> documentChecks { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        processedItems = new List<string>();
+        approvedAmount = 0.00;
+        string json = await sessionStorage.GetItemAsync<string>("userCred");
+        if (!String.IsNullOrEmpty(json))
+        {
+            user = JsonConvert.DeserializeObject<AuthUser>(json);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        await getFrequency();
+        await getUnits();
+        await getRoute();
+        await GetCatData();
+        await loadDocuments();
+        await getParse();
+    }
+    private async Task loadDocuments()
+    {
+        ShowSpinner();
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "api/documenttypes");
+
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+
+        using var httpResponse = await Http.SendAsync(request);
+
+        documentTypes = await httpResponse.Content.ReadFromJsonAsync<List<DocumentType>>();
+
+        StateHasChanged();
+        HideSpinner();
+    }
+    async void ShowReview(List<SupportDocument> document)
+    {
+        try
+        {
+            await dialogService.OpenAsync<Documents>($"Supporting documents for " + requested.claimant.Fullname + "'s " + document.First().item + " Refund",
+                       new Dictionary<string, object>() 
+                    {
+                      {"Documents", document},
+                      {"Elements", approvals},
+                      {"DocumentTypes",documentTypes },
+                      {"units",units},
+                      {"frequencies",frequencies},
+                      {"route",route},
+                      {"checks",documentChecks},
+                    },
+                       new DialogOptions() { Width = "1200px", Height = "780px", ShowClose = true });
+
+            if (!processedItems.Contains(document.First().item))
+                processedItems.Add(document.First().item);
+            approvedAmount = approvals.Sum(i => i.Value);
+            StateHasChanged();
+        }
+        catch { }
+    }
+    async Task ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+    public void ShowSpinner()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+    public void HideSpinner()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+    async Task confirmVetting()
+    {
+        ShowSpinner();
+        try
+        {
+            requested.ApprovedAmount = approvedAmount;
+            requested.Vetter = user.UserId.ToString();
+
+            if(requested.RefundItems.Where(d => d.vetState == true && d.documentType.ToLower() == "receipt").Distinct().ToList().Count > 0)
+            {
+                if(requested.RefundItems.Any(d => d.vetState == false && d.documentType.ToLower() == "receipt"))
+                {
+                    requested.Status = "partially approved";
+                }
+                else
+                {
+                    requested.Status = "approved";
+                }
+            }
+            else
+            {
+                requested.Status = "declined";
+            }
+            requested.Date_processed = DateTime.Now;
+
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/requests");
+
+            request.Content = new StringContent(JsonConvert.SerializeObject(requested), Encoding.UTF8, "application/json");
+
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                notificationMessage.Detail = "Medical Refund Request processed successfully";
+                notificationMessage.Summary = "Success";
+                notificationMessage.Severity = NotificationSeverity.Success;
+                notificationMessage.Duration = 5000;
+
+                await ShowNotification(notificationMessage);
+                HideSpinner();
+                dialogService.Close(true);
+            }
+            else
+            {
+                notificationMessage.Detail = "An error occurred while finalizing vetting process please try again";
+                notificationMessage.Summary = "Error Occurred";
+                notificationMessage.Severity = NotificationSeverity.Error;
+                notificationMessage.Duration = 5000;
+
+                await ShowNotification(notificationMessage);
+                HideSpinner();
+            }
+
+        }
+        catch
+        {
+            notificationMessage.Detail = "An error occurred while finalizing vetting process please try again";
+            notificationMessage.Summary = "Error Occurred";
+            notificationMessage.Severity = NotificationSeverity.Error;
+            notificationMessage.Duration = 5000;
+
+            await ShowNotification(notificationMessage);
+            HideSpinner();
+        }
+    }
+    async Task GetCatData()
+    {
+        ShowSpinner();
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "staffcategory");
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                staffCategory = await response.Content.ReadFromJsonAsync<List<Category>>();
+                StateHasChanged();
+            }
+        }
+        catch { }
+        HideSpinner();
+    }
+    async Task getFrequency()
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "pharma/getfrequency");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                this.frequencies = await response.Content.ReadFromJsonAsync<List<DrugPrescriptionFrequency>>();
+            }
+        }
+        catch { }
+    }
+    async Task getUnits()
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "pharma/getUnits");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                this.units = await response.Content.ReadFromJsonAsync<List<DrugUsageForm>>();
+            }
+        }
+        catch { }
+    }
+    async Task getRoute()
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "pharma/getRoute");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                this.route = await response.Content.ReadFromJsonAsync<List<DrugRouteOfAdministration>>();
+            }
+        }
+        catch { }
+    }
+    async Task getParse()
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "documentparsing/filter?requestID="+requested.ReportID);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+            using var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                this.documentChecks = await response.Content.ReadFromJsonAsync<List<RefundSupportDocumentCheck>>();
+            }
+        }
+        catch { }
+    }
+}

@@ -1,0 +1,12 @@
+C:\Users\barhen\source\repos\Refund\Refund\Shared\bin\Debug\net7.0\Refund.Shared.deps.json
+C:\Users\barhen\source\repos\Refund\Refund\Shared\bin\Debug\net7.0\Refund.Shared.dll
+C:\Users\barhen\source\repos\Refund\Refund\Shared\bin\Debug\net7.0\Refund.Shared.pdb
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\Refund.Shared.csproj.AssemblyReference.cache
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\Refund.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\Refund.Shared.AssemblyInfoInputs.cache
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\Refund.Shared.AssemblyInfo.cs
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\Refund.Shared.csproj.CoreCompileInputs.cache
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\Refund.Shared.dll
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\refint\Refund.Shared.dll
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\Refund.Shared.pdb
+C:\Users\barhen\source\repos\Refund\Refund\Shared\obj\Debug\net7.0\ref\Refund.Shared.dll

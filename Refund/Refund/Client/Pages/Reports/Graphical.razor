@@ -1,0 +1,292 @@
+﻿@using KNUST_Medical_Refund.Shared.Models
+@using System.Globalization
+<div class="row" style="display:flex;justify-content:space-between;padding: 5px;">
+    <div class="col-2">
+        <span>Period : </span>
+    </div>
+    <div class="col-4" style="display:flex;justify-content:center;">
+        <span style="font-weight: bolder; margin-top: 5px;">From</span>
+        <RadzenDatePicker @bind-Value="selectedDateFrom" TValue="DateTime" DateFormat="dddd, dd MMMM, yyyy" ShowTimeOkButton="true" Style="width:80%;margin-left:10px;"></RadzenDatePicker>
+    </div>
+    <div class="col-4" style="display:flex;justify-content:center;">
+        <span style="font-weight: bolder; margin-top: 5px;">To</span>
+        <RadzenDatePicker @bind-Value="selectedDateTo" TValue="DateTime" DateFormat="dddd, dd MMMM, yyyy" ShowTimeOkButton="true" Style="width:80%;margin-left:10px;"></RadzenDatePicker>
+    </div>
+    <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" href="#" style="visibility: hidden;"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+</div>
+<hr />
+<div class="row d-sm-flex justify-content-between align-items-center mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow mb-6">
+            <div class="card-header py-3" style="background-color: #b8221b;">
+                <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Refund Requests Threshold Ratio</h6>
+            </div>
+            <div class="card-body">
+                <RadzenChart>
+                    <RadzenDonutSeries Data="@requestRatio" Title="Threshold" CategoryProperty="State" ValueProperty="Total" />
+                </RadzenChart>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow mb-6">
+            <div class="card-header py-3" style="background-color: #d8cc20;">
+                <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Supporting Documents</h6>
+            </div>
+            <div class="card-body">
+                <RadzenChart>
+                    <RadzenDonutSeries Data="@requestRatio" Title="Documents" CategoryProperty="State" ValueProperty="Total" />
+                </RadzenChart>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row d-sm-flex justify-content-between align-items-center mb-4">
+    <div class="col-lg-7" style="margin-top:20px;">
+        <div class="card shadow mb-8">
+            <div class="card-header py-3" style="background-color: #068e3e;">
+                <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Refund Requests</h6>
+            </div>
+            <div class="card-body">
+                <RadzenChart>
+                    <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Date" Title="Declined" LineType="LineType.Dashed" ValueProperty="Revenue">
+                        <RadzenMarkers MarkerType="MarkerType.Square" />
+
+                    </RadzenColumnSeries>
+                    <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Date" Title="Approved" ValueProperty="Revenue">
+                        <RadzenMarkers MarkerType="MarkerType.Circle" />
+                        <Radzen.Blazor.RadzenColumnOptions Radius="5" />
+                    </RadzenColumnSeries>
+                    <RadzenCategoryAxis Padding="20" FormatString="{0:dd}" />
+                    <RadzenValueAxis Formatter="@FormatAsUSD">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Amount in GH¢" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card shadow mb-8">
+            <div class="card-header py-3" style="background-color: #0679cc;">
+                <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Refund Requests Threshold Ratio</h6>
+            </div>
+            <div class="card-body">
+                <RadzenArcGauge Style="width: 100%; height: 250px;">
+                    <RadzenArcGaugeScale Step="20" Min="0" Max="260" MinorStep="2" Radius="1.5" TickPosition=@tickPosition Y="0.9" Margin="0">
+                        <RadzenArcGaugeScaleValue Value=@value ShowValue=@showValue>
+                            <Template Context="pointer">
+                                <h4>
+                                    @pointer.Value <sup>km/h</sup>
+                                </h4>
+                            </Template>
+                        </RadzenArcGaugeScaleValue>
+                    </RadzenArcGaugeScale>
+                </RadzenArcGauge>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row d-sm-flex justify-content-between align-items-center mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow mb-6">
+            <div class="card-header py-3" style="background-color: #cc231b;">
+                <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Approval Rate</h6>
+            </div>
+            <div class="card-body">
+                <RadzenChart>
+                    <RadzenDonutSeries Data="@requestRatio" Title="Approved" CategoryProperty="State" ValueProperty="Total" />
+                </RadzenChart>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow mb-6">
+            <div class="card-header py-3" style="background-color: #1f1a17;">
+                <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Disapproval Rate</h6>
+            </div>
+            <div class="card-body">
+                <RadzenChart>
+                    <RadzenDonutSeries Data="@requestRatio" Title="Disapproved" CategoryProperty="State" ValueProperty="Total" />
+                </RadzenChart>
+            </div>
+        </div>
+    </div>
+</div>  
+  @code {
+        public DateTime selectedDateFrom, selectedDateTo;
+        bool smooth = true;
+
+        bool showValue = true;
+        double value = 100;
+        IEnumerable<GaugeTickPosition> tickPositions = Enum.GetValues(typeof(GaugeTickPosition)).Cast<GaugeTickPosition>();
+        GaugeTickPosition tickPosition = GaugeTickPosition.Outside;
+
+        class DataItem
+        {
+            public DateTime Date { get; set; }
+            public double Revenue { get; set; }
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            selectedDateTo = DateTime.Now;
+            selectedDateFrom = DateTime.Now.AddDays(-7);
+
+        }
+        RationItem[] requestRatio = new RationItem[]
+       {
+        new RationItem{
+            State = "Below ¢ 2000",
+            Total = 6000
+        },
+        new RationItem{
+            State = "Over ¢ 2000",
+            Total = 15000
+        },
+                               };
+
+        string FormatAsUSD(object value)
+        {
+            string newvalue = ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+            return "GH¢ " + newvalue.Substring(1);
+        }
+
+        RationItem[] revenueNHIS = new RationItem[]
+        {
+        new RationItem{
+            State = "Not Covered by",
+            Total = 6000
+        },
+        new RationItem{
+            State = "Covered by",
+            Total = 15000
+        },
+                            };
+
+        DataItem[] revenue2019 = new DataItem[] {
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-01"),
+            Revenue = 234000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-02"),
+            Revenue = 269000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-03"),
+            Revenue = 233000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-04"),
+            Revenue = 244000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-09"),
+            Revenue = 214000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-10"),
+            Revenue = 253000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-21"),
+            Revenue = 274000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-26"),
+            Revenue = 284000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-28"),
+            Revenue = 273000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-29"),
+            Revenue = 282000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-30"),
+            Revenue = 289000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-31"),
+            Revenue = 294000
+        }
+    };
+
+        DataItem[] revenue2020 = new DataItem[] {
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-01"),
+            Revenue = 334000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-02"),
+            Revenue = 369000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-04"),
+            Revenue = 333000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-06"),
+            Revenue = 344000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-07"),
+            Revenue = 314000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-09"),
+            Revenue = 353000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-11"),
+            Revenue = 374000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-13"),
+            Revenue = 384000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-14"),
+            Revenue = 373000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-16"),
+            Revenue = 382000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-18"),
+            Revenue = 389000
+        },
+        new DataItem
+        {
+            Date = DateTime.Parse("2019-01-20"),
+            Revenue = 394000
+        }
+    };
+    }

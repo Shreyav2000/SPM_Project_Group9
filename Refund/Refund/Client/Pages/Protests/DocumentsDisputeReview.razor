@@ -1,0 +1,655 @@
+﻿@page "/supportDisputeReview/{Documents}/{Elements}/{DocumentTypes}"
+@inject HttpClient Http
+@using KNUST_Medical_Refund.Shared.Models
+@inject DialogService dialogService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@inject TooltipService tooltipService
+@inject NotificationService notificationService
+@inject IJSRuntime JS
+@using Newtonsoft.Json
+@using RestSharp
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+
+<RadzenCard Style="margin-bottom: 20px;">
+    @if (documents.Count > 1)
+    {
+        <div class="d-sm-flex justify-content-between align-items-center mb-4">
+            <RadzenButton Click="@previousDocument" Text="Previous" Style="margin-bottom: 10px; width: 150px;background-color:#007bff;" />
+            <p style="color:#003445;"> <b>@(selectedIndex + 1)</b>  out of <b>@documents.Count</b> documents </p>
+            <RadzenButton Click="@nextDocument" Text="Next" Style="margin-bottom: 10px; width: 150px;background-color:#079737;" />
+        </div>
+    }
+    <RadzenCard>
+        <div class="row">
+            <div class="col-md-6">
+                <h6> Document Details (AS entered by claimant)</h6>
+                <hr />
+                <div>Institution Name:</div>
+                <b>
+                    @{
+                        institution = documents[selectedIndex].companyName;
+                        @institution
+                    }
+                </b>
+                <div>Document Type :</div>
+                <b>
+                    @{
+                        documentType = documents[selectedIndex].documentType;
+                        @documentType
+                    }
+                </b>
+                <div>Document ID:</div>
+                <b>
+                    @{
+                        documentID = documents[selectedIndex].documentID;
+                        @documentID
+                    }
+                </b>
+                @if (documents[selectedIndex].amount.HasValue)
+                {
+                    <div>Amount :</div>
+                    <b>
+                        @{
+                            amount = documents[selectedIndex].amount.ToString();
+                            @("GH¢ " + amount)
+                        }
+                    </b>
+                            }
+                <div>Date Issue:</div>
+                <b>
+                    @{
+                        documentDate = documents[selectedIndex].date.ToString("yyyy-MM-dd");
+                        @DateTime.Parse(documentDate).ToLongDateString()
+                    }
+                </b>
+                <div>Client's Name:</div>
+                <b>
+                    @{
+                        recipientName = documents[selectedIndex].clientName;
+                        @recipientName
+                    }
+                </b>
+                <br />
+                <div class="row" style="margin-top:20px;">
+                    <RadzenCard Style="width:100%; height:300px;overflow: auto;">
+                        <h6> Advisor</h6>
+                        <hr />
+                        @if (IsVisible)
+                        {
+                            <div class="spinner-container">
+                                <SpinKitCircle />
+                            </div>
+                        }
+                        @for (int i = 1; i <= events.Count; i++)
+                        {
+                            <p>@(i.ToString() + ") " + events[i - 1])</p>
+                            <br />
+                        }
+                    </RadzenCard>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6> Document (AS uploaded by claimant)</h6>
+                <hr />
+                @{
+                    string image = "api/imagepuller/filter?filename=" + documents[selectedIndex].attachment;
+                    <RadzenCard Style="width:100%;height:90%;">
+                        <RadzenImage Path="@image" Click="@(() => ShowInlineDialog(image))" Style="max-width: 100%; max-height: 100%;cursor:pointer;"> </RadzenImage>
+                    </RadzenCard>
+                }
+            </div>
+        </div>
+        <div>
+            <RadzenFieldset Text="Official Use">
+                <div class="row">
+                    <div class="align-items-center d-flex col-md-4">
+                        <RadzenLabel Text="Document Type" />
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenRadioButtonList @bind-Value=@nullableValue TValue="string">
+                            <Items>
+                                @foreach (DocumentType doc in documentTypes)
+                                {
+                                    <RadzenRadioButtonListItem Text="@doc.TypeName" Value="@doc.TypeCode" Disabled="true"/>
+                                }
+                            </Items>
+                        </RadzenRadioButtonList>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:10px;">
+                    <div class="align-items-center d-flex col-md-4">
+                        <RadzenLabel Text="Drugs / Investigation :" />
+                    </div>
+                    <div class="col-md-8" style="margin-top:10px;">
+
+                        <RadzenCheckBox @bind-Value="nhiscovered" TValue="bool" Name="Checkbox0" Change="@changeNHIS" Disabled="true"/><RadzenLabel Text="NHIS Covered" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                        <RadzenCheckBox @bind-Value="notcovered" TValue="bool" Name="Checkbox0" Change="@notchangeNHIS" Disabled="true"/><RadzenLabel Text="NHIS not covered" Style="margin-left: 2px;margin-right: 2px;margin-bottom: 20px" Component="CheckBox3" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="align-items-center d-flex col-md-4">
+                        <RadzenLabel Text="Date on document" />
+                    </div>
+                    <div class="col-md-6">
+                        <RadzenDatePicker style="width: 300px;" DateFormat="dddd, dd MMMM yyyy" @bind-Value="dateOndocument" Disabled="true"/>
+                    </div>
+                </div>
+
+                <div class="row" style="margin-bottom:10px;">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Cost Comparable with market price :" />
+                    </div>
+                    <div class="col-md-4">
+                        <RadzenCheckBox @bind-Value="marketPrice" TValue="bool" Change="changeMarket" Disabled="true"/><RadzenLabel Text="Yes" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+                        <RadzenCheckBox @bind-Value="nomarketPrice" TValue="bool" Change="notchangeMarket" Disabled="true"/><RadzenLabel Text="No" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom:10px;">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Satisfy all requirements :" />
+                    </div>
+                    <div class="col-md-6">
+                        <RadzenCheckBox @bind-Value="satisfied" TValue="bool" Change="@satisfactionChange1" Disabled="true"/><RadzenLabel Text="Yes" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+                        <RadzenCheckBox @bind-Value="unsatisfied" TValue="bool" Change="@satisfactionChange2" Disabled="true"/><RadzenLabel Text="No" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+                        <RadzenCheckBox @bind-Value="partiallysatisfied" TValue="bool" Change="@satisfactionChange3" Disabled="true"/><RadzenLabel Text="Partially" Style="margin-left: 5px;margin-right: 5px;" Component="CheckBox3" />
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="align-items-center d-flex col-md-4">
+                        <RadzenLabel Text="Amount approved" />
+                    </div>
+                    <div class="col-md-3">
+                        <RadzenLabel Text="GH¢ " />
+                        <RadzenNumeric Style="width: 80%;" Name="Amount" @bind-Value="approvedAmount" Disabled="true"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Comments : " /> <b></b>
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextArea @bind-Value="@approvalRemarks" Cols="70" Rows="6" Style="margin-bottom: 20px;margin-top:20px;" Disabled="true"/>
+                    </div>
+                </div>
+            </RadzenFieldset>
+            <center>
+                @if (documents[selectedIndex].vetState.HasValue && documents[selectedIndex].vetState.Value)
+                {
+                    <b> <RadzenLabel Text="APPROVED" Style="color:#079737;font-size: xx-large;" /> </b>
+                }
+                else if (documents[selectedIndex].vetState.HasValue && !documents[selectedIndex].vetState.Value)
+                {
+                    <b> <RadzenLabel Text="DECLINED" Style="color:crimson;font-size: xx-large;" /> </b>
+                }
+            </center>
+        </div>
+    </RadzenCard>
+</RadzenCard>
+<div class="row">
+    <div class="col-md-12">
+        <center>
+            <RadzenButton Click="@(() => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+        </center>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<SupportDocument> documents { get; set; }
+    [Parameter]
+    public SortedList<string, double> elements { get; set; }
+    [Parameter]
+    public List<DocumentType> documentTypes { get; set; }
+
+    public string institution, documentType, documentID, amount, documentDate, recipientName, requestID, documentGUID;
+    public string parseID;
+    public bool singleValue;
+    List<string> events = new List<string>();
+    public int number;
+    NotificationMessage notificationMessage = new NotificationMessage();
+
+    public bool approved, marketPrice, nomarketPrice;
+    public bool nhiscovered, notcovered, satisfied, unsatisfied, partiallysatisfied;
+    public string approvalRemarks;
+    public double approvedAmount;
+    public DateTime dateOndocument;
+    public AuthUser user;
+    public int selectedIndex = 0;
+
+    protected bool IsVisible { get; set; }
+    int value = 1;
+    public string nullableValue;
+    public int satisfaction;
+    protected async override Task OnInitializedAsync()
+    {
+        dateOndocument = DateTime.Now;
+        SpinnerService.OnShow += ShowSpinner;
+        SpinnerService.OnHide += HideSpinner;
+        satisfaction = 404;
+        number = 0;
+        string json = await sessionStorage.GetItemAsync<string>("userCred");
+        if (!String.IsNullOrEmpty(json))
+        {
+            user = JsonConvert.DeserializeObject<AuthUser>(json);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+
+
+        await loadAI(documents[selectedIndex].reportID);
+    }
+
+    public void ShowSpinner()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void HideSpinner()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+    private async Task loadAI(string id)
+    {
+        try
+        {
+            //events.Clear();
+            //ShowSpinner();
+            //requestID = id;
+
+            //var request = new HttpRequestMessage(HttpMethod.Get, "api/parsedocuments/filter?requestID=" + requestID);
+
+            //request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+
+            //using var httpResponse = await Http.SendAsync(request);
+
+            //data = await httpResponse.Content.ReadFromJsonAsync<List<ParseDocument>>();
+
+
+            //foreach (ParseDocument d in data.Where(r => r.parseID == documents[selectedIndex].parseID))
+            //{
+            //    if (d.documentID.Value)
+            //        events.Add("The document id " + documentID + " appeared on the document provided and " + d.documentState);
+            //    if (d.institution.Value)
+            //        events.Add("The name of the institution who issued this document is " + institution + " which appears on the document provided and " + d.institutionState);
+            //    if (d.amount.Value)
+            //        events.Add("The amount quoted " + amount + " appeared on the document provided and " + d.amountState);
+            //    if (d.client.Value)
+            //        events.Add("The name " + recipientName + " appeared on the document provided and " + d.clientState);
+            //    if (d.date.Value)
+            //        events.Add("The date  " + documentDate + " appeared on the document provided and " + d.dateState);
+            //    if (d.type.Value)
+            //        events.Add("The document is a/an " + documentType + " which is stated on the document provided and " + d.typeState);
+            //    if (d.duplicate.Value)
+            //        events.Add("The document ID entered" + documentID + " maybe a duplicate of a document id used a previous Refund request which ID : " + d.existingID);
+            //}
+
+            if (events.Count < 1)
+                events.Add("Nothing to show at this moment");
+            events.Add("Please examine the document closely by clicking on the document zoom in");
+
+            getVetted();
+        }
+        catch { }
+        HideSpinner();
+    }
+
+    async Task ShowInlineDialog(string path) => await dialogService.OpenAsync("", ds =>
+    @<div>
+        <WheelZoom Image="@path" width="100%;" height="100%;" />
+    </div>);
+
+    async void approveDocument(string ID)
+    {
+        SupportDocument DD = documents[selectedIndex];
+        try
+        {
+            VettedDocument vetted = new VettedDocument();
+            vetted.VetterId = user.UserId.ToString();
+            vetted.DocumentGuid = documents[selectedIndex].documentGUID;
+            vetted.DocumentType = nullableValue;
+            vetted.Comments = approvalRemarks;
+            vetted.AmountApproved = decimal.Parse(approvedAmount.ToString());
+            vetted.NhisCovered = nhiscovered;
+            vetted.RequestId = requestID;
+            vetted.Satisfy = satisfaction;
+            vetted.ComparableMarket = marketPrice;
+            vetted.DocumentDate = dateOndocument;
+
+            DD.vetState = true;
+            if (!elements.ContainsKey(ID))
+            {
+                number++;
+                elements.Add(ID, approvedAmount);
+            }
+            else
+            {
+                elements.Remove(ID);
+                elements.Add(ID, approvedAmount);
+            }
+
+            DD.vetting = vetted;
+
+            if (selectedIndex + 1 == documents.Count)
+            {
+                dialogService.Close(true);
+            }
+            else
+            {
+                nextDocument();
+            }
+
+            notificationMessage.Detail = "Supporting document for " + documents.First().item + " has been successfully approved !!!";
+            notificationMessage.Summary = "Document Approved";
+            notificationMessage.Severity = NotificationSeverity.Success;
+            notificationMessage.Duration = 5000;
+
+            await ShowNotification(notificationMessage);
+        }
+        catch
+        {
+        }
+    }
+
+    async Task ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    async void declineDocument(string ID)
+    {
+        foreach (SupportDocument DD in documents.Where(d => d.documentGUID == ID))
+        {
+            try
+            {
+                VettedDocument vetted = new VettedDocument();
+                vetted.VetterId = user.UserId.ToString();
+                vetted.DocumentGuid = documents[selectedIndex].documentGUID;
+                vetted.DocumentType = nullableValue;
+                vetted.Comments = approvalRemarks;
+                vetted.AmountApproved = decimal.Parse(approvedAmount.ToString());
+                vetted.NhisCovered = nhiscovered;
+                vetted.RequestId = requestID;
+                vetted.Satisfy = satisfaction;
+                vetted.ComparableMarket = marketPrice;
+                vetted.DocumentDate = dateOndocument;
+
+                DD.vetState = false;
+                if (elements.ContainsKey(ID))
+                {
+                    number++;
+                    elements.Remove(ID);
+                }
+                else if (!elements.ContainsKey(ID))
+                {
+                    number++;
+                }
+                DD.vetting = vetted;
+            }
+            catch { }
+        }
+        if (selectedIndex + 1 == documents.Count)
+        {
+            dialogService.Close(true);
+        }
+        else
+        {
+            nextDocument();
+        }
+
+        notificationMessage.Detail = "Supporting document for " + documents.First().item + "  has been declined !!!";
+        notificationMessage.Summary = "Document Declined";
+        notificationMessage.Severity = NotificationSeverity.Error;
+        notificationMessage.Duration = 5000;
+
+        await ShowNotification(notificationMessage);
+    }
+
+    void supportChange()
+    {
+        StateHasChanged();
+    }
+    void changeMarket()
+    {
+        if (marketPrice)
+        {
+            nomarketPrice = false;
+        }
+        else
+        {
+            marketPrice = false;
+        }
+    }
+    void notchangeMarket()
+    {
+        if (nomarketPrice)
+        {
+            marketPrice = false;
+        }
+        else
+        {
+            nomarketPrice = false;
+        }
+    }
+
+    void changeNHIS()
+    {
+        if (nhiscovered)
+        {
+            notcovered = false;
+        }
+        else
+        {
+            nhiscovered = false;
+        }
+    }
+    void notchangeNHIS()
+    {
+        if (notcovered)
+        {
+            nhiscovered = false;
+        }
+        else
+        {
+            notcovered = false;
+        }
+    }
+
+    void satisfactionChange1()
+    {
+        if (satisfied)
+        {
+            unsatisfied = false;
+            partiallysatisfied = false;
+            satisfaction = 1;
+        }
+        else
+        {
+            satisfied = false;
+            satisfaction = 0;
+        }
+    }
+    void satisfactionChange2()
+    {
+        if (unsatisfied)
+        {
+            satisfied = false;
+            partiallysatisfied = false;
+            satisfaction = 2;
+        }
+        else
+        {
+            satisfaction = 0;
+            unsatisfied = false;
+        }
+    }
+    void satisfactionChange3()
+    {
+        if (partiallysatisfied)
+        {
+            unsatisfied = false;
+            satisfied = false;
+            satisfaction = 3;
+        }
+        else
+        {
+            partiallysatisfied = false;
+            satisfaction = 0;
+        }
+    }
+
+
+    void nextDocument()
+    {
+        if (selectedIndex < documents.Count - 1)
+        {
+            selectedIndex++;
+
+            events.Clear();
+            ShowSpinner();
+
+            documentGUID = documents[selectedIndex].documentGUID;
+            requestID = documents[selectedIndex].reportID;
+            parseID = documents[selectedIndex].parseID;
+
+            //foreach (ParseDocument d in data.Where(r => r.parseID == parseID))
+            //{
+            //    if (d.documentID.Value)
+            //        events.Add("The document id " + documents[selectedIndex].documentID + " appeared on the document provided and " + d.documentState);
+            //    if (d.institution.Value)
+            //        events.Add("The name of the institution who issued this document is " + documents[selectedIndex].companyName + " which appears on the document provided and " + d.institutionState);
+            //    if (d.amount.Value)
+            //        events.Add("The amount quoted " + documents[selectedIndex].amount + " appeared on the document provided and " + d.amountState);
+            //    if (d.client.Value)
+            //        events.Add("The name " + documents[selectedIndex].clientName + " appeared on the document provided and " + d.clientState);
+            //    if (d.date.Value)
+            //        events.Add("The date  " + documents[selectedIndex].date + " appeared on the document provided and " + d.dateState);
+            //    if (d.type.Value)
+            //        events.Add("The document is a/an " + documents[selectedIndex].documentType + " which is stated on the document provided and " + d.typeState);
+            //    if (d.duplicate.Value)
+            //        events.Add("The document ID entered" + documents[selectedIndex].documentID + " maybe a duplicate of a document id used a previous Refund request which ID : " + d.existingID);
+            //}
+            HideSpinner();
+            if (events.Count < 1)
+                events.Add("Nothing to show at this moment");
+            events.Add("Please examine the document closely by clicking on the document zoom in");
+
+            getVetted();
+            HideSpinner();
+
+        }
+    }
+
+    void previousDocument()
+    {
+        if (selectedIndex > 0)
+        {
+            selectedIndex--;
+
+            events.Clear();
+            ShowSpinner();
+
+            documentGUID = documents[selectedIndex].documentGUID;
+            requestID = documents[selectedIndex].reportID;
+            parseID = documents[selectedIndex].parseID;
+
+            //foreach (ParseDocument d in data.Where(r => r.parseID == parseID))
+            //{
+            //    if (d.documentID.Value)
+            //        events.Add("The document id " + documents[selectedIndex].documentID + " appeared on the document provided and " + d.documentState);
+            //    if (d.institution.Value)
+            //        events.Add("The name of the institution who issued this document is " + documents[selectedIndex].companyName + " which appears on the document provided and " + d.institutionState);
+            //    if (d.amount.Value)
+            //        events.Add("The amount quoted " + documents[selectedIndex].amount + " appeared on the document provided and " + d.amountState);
+            //    if (d.client.Value)
+            //        events.Add("The name " + documents[selectedIndex].clientName + " appeared on the document provided and " + d.clientState);
+            //    if (d.date.Value)
+            //        events.Add("The date  " + documents[selectedIndex].date + " appeared on the document provided and " + d.dateState);
+            //    if (d.type.Value)
+            //        events.Add("The document is a/an " + documents[selectedIndex].documentType + " which is stated on the document provided and " + d.typeState);
+            //    if (d.duplicate.Value)
+            //        events.Add("The document ID entered" + documents[selectedIndex].documentID + " maybe a duplicate of a document id used a previous Refund request which ID : " + d.existingID);
+            //}
+            if (events.Count < 1)
+                events.Add("Nothing to show at this moment");
+            events.Add("Please examine the document closely by clicking on the document zoom in");
+
+            getVetted();
+            HideSpinner();
+
+        }
+    }
+
+    void getVetted()
+    {
+        VettedDocument d = documents.Where(r => r.documentGUID == documents[selectedIndex].documentGUID).Select(rp => rp.vetting).First();
+        if (d != null)
+        {
+            nullableValue = d.DocumentType;
+            approvedAmount = double.Parse(d.AmountApproved.Value.ToString());
+            approvalRemarks = d.Comments;
+            dateOndocument = d.DocumentDate.Value;
+
+
+            if (d.NhisCovered.Value)
+            {
+                nhiscovered = true;
+                notcovered = false;
+            }
+            else
+            {
+                nhiscovered = false;
+                notcovered = true;
+            }
+
+            if (d.ComparableMarket.Value)
+            {
+                marketPrice = true;
+                nomarketPrice = false;
+            }
+            else
+            {
+                marketPrice = false;
+                nomarketPrice = true;
+            }
+
+            switch (d.Satisfy.Value)
+            {
+                case 1:
+                    satisfied = true;
+                    satisfactionChange1();
+                    break;
+                case 2:
+                    unsatisfied = true;
+                    satisfactionChange2();
+                    break;
+                case 3:
+                    partiallysatisfied = true;
+                    satisfactionChange3();
+                    break;
+            }
+        }
+        else
+        {
+            satisfaction = 404;
+            nullableValue = null;
+            approvalRemarks = null;
+            nhiscovered = false;
+            notcovered = false;
+            dateOndocument = DateTime.Now;
+            approvedAmount = 0;
+            approvalRemarks = "";
+            marketPrice = false;
+            nomarketPrice = false;
+        }
+    }
+    }

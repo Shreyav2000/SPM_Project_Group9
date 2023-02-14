@@ -1,0 +1,25 @@
+{
+  "name": "Medical Refund Web Service",
+  "short_name": "MDF",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#03173d",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    },
+    {
+      "src": "favicon.ico",
+      "type": "image/ico",
+      "sizes": "256x256"
+    },
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+﻿@using BlazorTable
+@using KNUST_Medical_Refund.Shared.Models
+@using System.Globalization
+<hr />
+<div style="display:flex;justify-content:space-between;">
+    <div>
+        <p>
+            The total approved refund amount for the month of <b>@selectedMonth.ToString("MMMM, yyyy")</b> is <b>@FormatAsUSD(data != null ? data.Sum(a => a.ApprovedAmount) : 0) </b>
+            <br />
+            The total declined refund amount for the month of <b>@selectedMonth.ToString("MMMM, yyyy")</b> is <b>@FormatAsUSD(data != null ? data.Sum(a => a.RequestedAmount - a.ApprovedAmount) : 0) </b>
+        </p>
+    </div>
+    @*<RadzenButton Text="Print Report" Style="background-color:green;" />*@
+</div>
+<Table TableItem="Request" Items="data" PageSize="15">
+    <Column TableItem="Request" Title="Date Processed" Field="@(x => x.Date_processed)" Sortable="true" Filterable="false" Width="30%">
+        <Template>
+            @(context.Date_processed.HasValue ? context.Date_processed.Value.ToString("dddd dd, MMMM yyyy") : string.Empty)
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Total Number Of Requests" Field="@(x => x.ReportID)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @( int.Parse(context.ReportID) > 1 ? context.ReportID + " Requests" : context.ReportID + " Request")
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Total Requested Amount" Field="@(x => x.RequestedAmount)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @( FormatAsUSD(context.RequestedAmount))
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Total Approved Amount" Field="@(x => x.ApprovedAmount)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @( FormatAsUSD(context.ApprovedAmount))
+        </Template>
+    </Column>
+    <Column TableItem="Request" Title="Total Declined Amount" Field="@(x => x.ApprovedAmount)" Sortable="true" Filterable="false" Width="10%">
+        <Template>
+            @( FormatAsUSD(context.RequestedAmount-context.ApprovedAmount))
+        </Template>
+    </Column>
+    <Pager ShowPageNumber="true" ShowTotalCount="true" ShowPageSizes="true" />
+</Table>
+@code{
+    [Parameter]
+    public List<Request> data { get; set; }
+    [Parameter]
+    public DateTime selectedMonth { get; set; }
+
+    string FormatAsUSD(object value)
+    {
+        string newvalue = ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+        return "GH¢ " + newvalue.Substring(1);
+    }
+}

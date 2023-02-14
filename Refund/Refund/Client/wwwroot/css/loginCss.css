@@ -1,0 +1,282 @@
+﻿body {
+}
+
+@font-face {
+    font-family: 'WickedGrit';
+    src: url('fonts/WickedGrit.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*------------------------
+	base class definition
+-------------------------*/
+
+footer {
+    width: 100vw;
+    position: fixed;
+    bottom: 0px
+}
+
+    footer div {
+        background-color: #079737;
+        margin: -5px 0px 0px 0px;
+        padding: 0px;
+        color: #fff;
+        text-align: center;
+    }
+
+svg {
+    width: 100%;
+    overflow: visible;
+}
+
+.wave {
+    animation: wave 3s linear;
+    animation-iteration-count: infinite;
+    fill: #079737;
+}
+
+.drop {
+    fill: #079737;
+    xfill: #079737;
+    animation: drop 3.2s linear infinite normal;
+    stroke: #079737;
+    stroke-width: 0.5;
+    transform: translateY(25px);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+}
+
+.drop1 {
+}
+
+.drop2 {
+    animation-delay: 3s;
+    animation-duration: 3s;
+}
+
+.drop3 {
+    animation-delay: -2s;
+    animation-duration: 3.4s;
+}
+
+.drop4 {
+    animation-delay: 1.7s;
+}
+
+.drop5 {
+    animation-delay: 2.7s;
+    animation-duration: 3.1s;
+}
+
+.drop6 {
+    animation-delay: -2.1s;
+    animation-duration: 3.2s;
+}
+
+.gooeff {
+    filter: url(#goo);
+}
+
+#wave2 {
+    animation-duration: 5s;
+    animation-direction: reverse;
+    opacity: .6
+}
+
+#wave3 {
+    animation-duration: 7s;
+    opacity: .3;
+}
+
+@keyframes drop {
+    0% {
+        transform: translateY(25px);
+    }
+
+    30% {
+        transform: translateY(-10px) scale(.1);
+    }
+
+    30.001% {
+        transform: translateY(25px) scale(1);
+    }
+
+    70% {
+        transform: translateY(25px);
+    }
+
+    100% {
+        transform: translateY(-10px) scale(.1);
+    }
+}
+
+@keyframes wave {
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.KNUSTHEAD {
+    color: white;
+    margin: 30px;
+    display: inline-block;
+    font: normal normal normal 45px 'WickedGrit';
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#header {
+    /*padding-left: 250px;*/
+    display: flex;
+    justify-content: center;
+}
+
+
+@media (max-width: 900px) {
+    #header {
+        padding-left: 20px;
+        display: flex;
+    }
+
+    .KNUSTHEAD {
+        color: white;
+        margin-top: 6px;
+        font: normal normal normal 12px 'WickedGrit';
+        text-transform: none;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .titleHead {
+        height: 76px;
+        /* width: 89px; */
+        margin-left: 133px;
+    }
+}
+
+#form {
+    max-width: 400px;
+    position: relative;
+    left: 50%;
+    top: 10%;
+    margin-bottom: 50px;
+    border-radius: 4px;
+    transform: translate(-50%, 10%);
+    color: #fff;
+    box-shadow: 3px 3px 4px rgba(0,0,0,0.2);
+}
+
+#head {
+    text-align: center;
+    color: white;
+    display: inline-block;
+    font: normal normal normal 40px 'WickedGrit';
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.titleHead {
+    height: 112px;
+    width: 89px;
+}
+
+#image {
+    max-height: 160px;
+    max-width: 100px;
+    /* margin: 31px;
+    margin-left: 100px;*/
+    margin-bottom: 50px;
+}
+
+#linkas {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.9;
+    text-decoration: none;
+}
+
+#butonas {
+    background: #70b2d0;
+    outline: none;
+    text-shadow: initial;
+}
+
+#formum {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #434a52;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+    color: inherit;
+    text-align: center;
+}
+
+#formum2 {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #434a52;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+    color: inherit;
+    text-align: center;
+}
+
+.headingT {
+    background-image: linear-gradient(to bottom, #079737,#fff);
+    height: 120px;
+}
+
+@media (max-width: 1400px) {
+    .headingT {
+        background-image: linear-gradient(to bottom, #079737,#fff);
+        height: 60px;
+    }
+
+    #header {
+        padding-left: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .KNUSTHEAD {
+        color: white;
+        margin: 17px;
+        font: normal normal normal 20px 'WickedGrit';
+        text-transform: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    footer {
+        width: 100vw;
+        position: fixed;
+        bottom: 0px;
+        height: 170px;
+    }
+
+    .titleHead {
+        height: 57px;
+        width: 45px;
+    }
+    #form {
+        max-width: 330px;
+        position: relative;
+        left: 50%;
+        margin-bottom: 50px;
+        padding: 20px;
+        border-radius: 4px;
+        transform: translate(-50%, 10%);
+        color: #fff;
+        box-shadow: 3px 3px 4px rgb(0 0 0 / 20%);
+    }
+    #image {
+        max-height: 110px;
+        max-width: 80px;
+        margin-bottom: 40px;
+    }
+}

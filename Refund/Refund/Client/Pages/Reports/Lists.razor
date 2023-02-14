@@ -1,0 +1,96 @@
+﻿@using KNUST_Medical_Refund.Shared.Models
+@inject HttpClient Http
+@using BlazorTable
+@inject DialogService dialogService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+
+@if (IsVisible)
+{
+    <div id="loading-div-background">
+        <div id="loading-div" class="ui-corner-all">
+            <div class="spinnermain-container">
+                <SpinKitCircle />
+            </div>
+            <h2 style="color:#003445;font-weight:normal;"></h2>
+        </div>
+    </div>}
+<div class="row" style="display:flex;justify-content:space-between;padding: 5px;">
+    <Radzen.Blazor.RadzenDropDown Data="types" TextProperty="TypeName" ValueProperty="TypeValue" @bind-Value="Type" Style="width:14%;" Change="onchange" />
+    @if (Type == 1)
+    {
+        <div class="col-4" style="display:flex;justify-content:center;">
+            <span style="font-weight: bolder; margin-top: 5px;">From</span>
+            <RadzenDatePicker @bind-Value="selectedDateFrom" TValue="DateTime" DateFormat="dddd, dd MMMM, yyyy" ShowTimeOkButton="true" Style="width:80%;margin-left:10px;"></RadzenDatePicker>
+        </div>
+        <div class="col-4" style="display:flex;justify-content:center;">
+            <span style="font-weight: bolder; margin-top: 5px;">To</span>
+            <RadzenDatePicker @bind-Value="selectedDateTo" TValue="DateTime" DateFormat="dddd, dd MMMM, yyyy" ShowTimeOkButton="true" Style="width:80%;margin-left:10px;"></RadzenDatePicker>
+        </div>
+        <RadzenButton Text="Generate Report" Click="getData" Style="background-color:#003445;" />
+    }
+    else if (Type == 2)
+    {
+        <div class="col-4" style="display:flex;justify-content:center;">
+            <span style="font-weight: bolder; margin-top: 5px;">Date</span>
+            <RadzenDatePicker @bind-Value="selectedDate" TValue="DateTime" DateFormat="dddd, dd MMMM, yyyy" ShowTimeOkButton="true" Style="width:100%;margin-left:10px;"></RadzenDatePicker>
+        </div>
+        <RadzenButton Text="Generate Report" Style="background-color:#003445;" Click="getDaily" />
+    }
+    else
+    {
+        <div class="col-4" style="display:flex;justify-content:center;">
+            <span style="font-weight: bolder; margin-top: 5px;">Month</span>
+            <RadzenDatePicker @bind-Value="selectedDate" TValue="DateTime" DateFormat="MMMM, yyyy" ShowTimeOkButton="true" Style="width:100%;margin-left:10px;"></RadzenDatePicker>
+        </div>
+        <RadzenButton Text="Generate Report" Style="background-color:#003445;" Click="getMonthly" />
+    }
+</div>
+<hr />
+<div class="row" style="display:flex;justify-content:flex-start;padding: 5px;">
+    <div style="width: 110px; height: 35px; background-color: black; padding-left: 10px; color: white;padding-top: 5px;">
+        <span>Filter By</span>
+    </div>
+    <div style="border-right: 1px solid #003445;padding-right:3px;">
+        <RadzenTextBox Placeholder="HOSPITAL NUMBER" @oninput="@(args => filterHospitalNumber(args.Value.ToString()))" Disabled="@(selectedType == 3)" />
+    </div>
+    <div style="border-right: 1px solid #003445;">
+        <RadzenSplitButton Text="@status" Click=@(args => onStatus(args)) Style="background-color:#8f8a12;" Disabled="@(selectedType == 3)">
+            <ChildContent>
+                <RadzenSplitButtonItem Text="Pending" Value="1" />
+                <RadzenSplitButtonItem Text="Approved" Value="2" />
+                <RadzenSplitButtonItem Text="Declined" Value="3" />
+                <RadzenSplitButtonItem Text="Pending Preapproval" Value="4" />
+                <RadzenSplitButtonItem Text="Clear" Value="5" />
+            </ChildContent>
+        </RadzenSplitButton>
+    </div>
+    <div style="padding-right:5px;">
+        <RadzenSplitButton Text="@threshold" Click=@(args => onThreshold(args)) Style="background-color:#8f8a12;">
+            <ChildContent>
+                <RadzenSplitButtonItem Text="Less than ¢ 2000" Value="1" />
+                <RadzenSplitButtonItem Text="Over ¢ 2000" Value="2" />
+                <RadzenSplitButtonItem Text="All Thresholds" Value="3" />
+            </ChildContent>
+        </RadzenSplitButton>
+    </div>
+    @*<RadzenButton Text="Reload" Style="background-color:#003445;margin-left:20px;" />*@
+</div>
+@switch (selectedType)
+{
+    case 1:
+        <KNUST_Medical_Refund.Client.Pages.Reports.Tables.PeriodicAll data="data" />
+        break;
+    case 2:
+        <KNUST_Medical_Refund.Client.Pages.Reports.Tables.DailyReport data="data" date="selectedDate" />
+        break;
+    case 3:
+        <KNUST_Medical_Refund.Client.Pages.Reports.Tables.MonthlyReport data="data" selectedMonth="selectedDate" />
+        break;
+}
+
+@code {
+
+}

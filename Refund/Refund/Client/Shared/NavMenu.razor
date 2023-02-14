@@ -1,0 +1,171 @@
+﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@using KNUST_Medical_Refund.Shared.Models
+@using Newtonsoft.Json
+@inject NavigationManager NavigationManager
+@using System.ComponentModel.DataAnnotations
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <div class="top-row pl-4 navbar navbar-dark">
+        <center>
+            <div class="text-uppercase text-success font-weight-bold text-xs mb-1" style="width: 100%;">
+                <span class="navbar-brand" style="color:white;">Welcome</span>
+            </div>
+        </center>
+        <button class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    @if (user.Role == "head")
+    {
+<ul class="nav flex-column">
+    <li class="nav-item px-3">
+        <NavLink class="nav-link" href="main" Match="NavLinkMatch.All" @onclick="() => subMenus(0)">
+            <span class="oi oi-home" aria-hidden="true"></span> Home
+        </NavLink>
+    </li>
+    <li class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="() => subMenus(1)">
+            <span class="oi oi-inbox" aria-hidden="true"></span> Requests
+        </NavLink>
+        @if (expandSubNav)
+        {
+            <ul class="nav flex-column">
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="pending">
+                        <span class="oi oi-reload" aria-hidden="true"></span>Pending
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="approvedHead">
+                        <span class="oi oi-task" aria-hidden="true"></span>Processed
+                    </NavLink>
+
+                </li>
+            </ul>
+        }
+    </li>
+
+    <li class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="() => subMenus(3)">
+            <span class="oi oi-action-redo" aria-hidden="true"></span> Protests
+        </NavLink>
+        @if (expandSubNavProtest)
+        {
+            <ul class="nav flex-column">
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="pendingprotest">
+                        <span class="oi oi-reload" aria-hidden="true"></span>Pending
+                    </NavLink>
+                </li>
+
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="processedprotests">
+                        <span class="oi oi-task" aria-hidden="true"></span>Processed
+                    </NavLink>
+
+                </li>
+            </ul>
+        }
+    </li>
+    <li class="nav-item px-3">
+        <NavLink class="nav-link" href="reportsMain">
+            <span class="iconify" data-icon="oi:document" aria-hidden="true" style="width: 25px; height: 20px;margin-right:10px;"></span> Reports
+        </NavLink>
+    </li>
+    <li class="nav-item px-3">
+        <NavLink class="nav-link" @onclick="() => subMenus(10)">
+            <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
+        </NavLink>
+    </li>
+</ul>
+    }
+    else
+    {
+        <ul class="nav flex-column">
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="main" Match="NavLinkMatch.All" @onclick="() => subMenus(0)">
+                    <span class="oi oi-home" aria-hidden="true"></span> Home
+                </NavLink>
+            </li>
+
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="pending" @onclick="() => subMenus(0)">
+                    <span class="oi oi-reload" aria-hidden="true"></span>Pending Requests
+                </NavLink>
+            </li>
+
+            <li class="nav-item px-3">
+
+                <NavLink class="nav-link" href="approvedSub" @onclick="() => subMenus(0)">
+                    <span class="oi oi-task" aria-hidden="true"></span>Processed Requests
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" @onclick="() => subMenus(10)">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span> Log out
+                </NavLink>
+            </li>
+        </ul>
+    }
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private bool expandSubNav;
+    private bool expandNewuser;
+    private bool expandSubNavProtest = false;
+    private string username;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+    private async void subMenus(int selection)
+    {
+        switch (selection)
+        {
+            case 1:
+                expandSubNav = true;
+                expandNewuser = false;
+                expandSubNavProtest = false;
+                break;
+            case 2:
+                expandSubNav = false;
+                expandNewuser = true;
+                expandSubNavProtest = false;
+                break;
+            case 10:
+                await sessionStorage.ClearAsync();
+                NavigationManager.NavigateTo("/");
+                break;
+            case 3:
+                expandSubNav = false;
+                expandNewuser = false;
+                expandSubNavProtest = true;
+                break;
+            default:
+                expandSubNav = false;
+                expandNewuser = false;
+                expandSubNavProtest = false;
+                break;
+        }
+    }
+    public AuthUser user = new AuthUser();
+
+    protected override async Task OnInitializedAsync()
+    {
+        string json = await sessionStorage.GetItemAsync<string>("userCred");
+        if (!String.IsNullOrEmpty(json))
+        {
+            user = JsonConvert.DeserializeObject<AuthUser>(json);
+            username = user.Username.ToLower();
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

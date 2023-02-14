@@ -1,0 +1,67 @@
+﻿@page "/completedtranscribe/{documentGUID}/{route}/{frequencies}/{units}"
+@inject HttpClient Http
+@inject DialogService dialogService
+@inject Radzen.NotificationService notificationService
+@using Radzen.Blazor
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@using KNUST_Medical_Refund.Shared.Models
+
+@if (IsVisible)
+{
+    <div id="loading-div-background">
+        <div id="loading-div" class="ui-corner-all">
+            <div class="spinnermain-container">
+                <SpinKitCircle />
+            </div>
+            <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+        </div>
+    </div>
+}
+@if (transcribes.Count > 0)
+{
+    <h3>Results of transcribed contents of selected prescription form by pharmacist</h3>
+    <div style="display:flex;margin-bottom:65px; justify-content:space-between;">
+
+        <BlazorTable.Table TableItem="PharmacyTranscribe" Items="@(transcribes)" PageSize="15" ColumnReorder="true" ShowSearchBar="true">
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Drug Name" Field="@(x => x.Drugname)" Sortable="true" Filterable="false" Width="25%" />
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Dosage" Field="@(x => x.Dosage)" Sortable="true" Filterable="false" Width="8%" />
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Unit" Field="@(x => x.Unit)" Sortable="true" Filterable="false" Width="12%">
+                <Template>
+                    @(units.Where(r => r.UsageFormId == context.Unit).Select(p => p.FormName).FirstOrDefault())
+                </Template>
+            </BlazorTable.Column>
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Frequency" Field="@(x => x.Frequency)" Sortable="true" Filterable="false" Width="12%">
+                <Template>
+                    @(frequencies.Where(r => r.Id == context.Frequency).Select(p => p.FrequencyName).FirstOrDefault())
+                </Template>
+            </BlazorTable.Column>
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Duration (Days)" Field="@(x => x.Duration)" Sortable="true" Filterable="false" Width="10%">
+                <Template>
+                    @(context.Duration + " days")
+                </Template>
+            </BlazorTable.Column>
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Route Of Administration" Field="@(x => x.Route)" Sortable="true" Filterable="false" Width="13%">
+                <Template>
+                    @(route.Where(r => r.Id == context.Route).Select(p => p.Name).FirstOrDefault())
+                </Template>
+            </BlazorTable.Column>
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Notes" Field="@(x => x.Notes)" Sortable="true" Filterable="false" Width="20%" />
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Purchased Drug" Field="@(x => x.Purchased)" Sortable="true" Filterable="false" Width="20%" />
+            <BlazorTable.Column TableItem="PharmacyTranscribe" Title="Dated Purchased" Field="@(x => x.DatePurchased)" Sortable="true" Filterable="false" Width="20%">
+                <Template Context="context">
+                    @(context.DatePurchased.HasValue ? context.DatePurchased.Value.ToString("dd/MM/yyyy"):" ")
+                </Template>
+            </BlazorTable.Column>
+        </BlazorTable.Table>
+    </div>
+}
+else
+{
+    <center style="margin-top:20%;">
+        <h3>Nothing to show here</h3>
+    </center>
+}
+

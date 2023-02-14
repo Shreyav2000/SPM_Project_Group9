@@ -1,0 +1,135 @@
+﻿body::-webkit-scrollbar {
+    background-color: #079737;
+}
+.ui-button.btn-primary, .btn-primary.ui-paginator-element {
+    background-color: #5dbf74;
+}
+#loading-div {
+    width: 300px;
+    height: 200px;
+    background-color: white;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -150px;
+    margin-top: -100px;
+    color: #003445 !important;
+    border: solid 3px #003445;
+}
+.table-hover tbody tr:hover {
+    color: #fff;
+    background-color: #5dbf74;
+    cursor: pointer;
+}
+.ui-dialog-titlebar {
+    background-color: #079737;
+    color: #fff;
+    text-align: center;
+}
+.ui-dialog-titlebar-close .pi-times {
+    font-size: 1.25rem;
+    color: white;
+    vertical-align: middle;
+}
+.ui-chkbox-box.ui-state-active {
+    background-color: #079737;
+    border: 1px solid #dadfe2;
+}
+ui-selectbutton .ui-button.ui-state-active, .ui-selectbutton .ui-state-active.ui-paginator-element {
+    background-color: #079737;
+    color: #ffffff;
+    border: solid 1px #079737;
+}
+.ui-selectbutton .ui-button.ui-state-active, .ui-selectbutton .ui-state-active.ui-paginator-element {
+    background-color: #079737;
+    color: #ffffff;
+    border: solid 1px #079737;
+}
+body:not(.rz-default-scrollbars) ::-webkit-scrollbar-thumb {
+    background: #079737;
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 8px;
+}
+body:not(.rz-default-scrollbars)::-webkit-scrollbar-thumb {
+    background: #079737;
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 8px;
+}
+.ui-dropdown-item.ui-state-highlight, .ui-dropdown-items li.ui-state-highlight, .ui-multiselect-items li.ui-state-highlight, .ui-autocomplete-items li.ui-state-highlight, .ui-state-highlight.ui-multiselect-item, .ui-state-highlight.ui-autocomplete-list-item, .ui-state-highlight.ui-menuitem {
+    background-color: #079737;
+    color: #ffffff;
+    box-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01);
+    border-radius: 0;
+}
+.ui-dropdown-item:hover, .ui-dropdown-items li:hover, .ui-multiselect-items li:hover, .ui-autocomplete-items li:hover, .ui-multiselect-item:hover, .ui-autocomplete-list-item:hover, .ui-menuitem:hover {
+    background-color: #5dbf74;
+    color: #ffffff;
+    border-radius: 0;
+    cursor:pointer;
+}
+.rz-scheme-pastel .rz-series-item-1 {
+    fill: #079737;
+    stroke: #079737;
+}
+.rz-scheme-pastel .rz-series-item-0 {
+    fill: #d8cd03;
+    stroke: #d8cd03;
+}
+a:not([href]):not([tabindex]) {
+     color: #6c757d; 
+    text-decoration: none;
+}
+    a:not([href]):not([tabindex]):hover, a:not([href]):not([tabindex]):focus {
+        color: #079737;
+        text-decoration: none;
+    }
+.ui-state-active a[role='tab'] {
+    color: #079737;
+}
+.ui-tabview-nav .ui-tabview-selected {
+    background-color: #ffffff;
+    margin-bottom: -1px;
+    position: relative;
+    border-top-color: #079737;
+}
+.rz-arc-gauge-scale-value {
+    fill: #cc231b;
+}
+
+.refundList {
+    font-weight:bold;
+    padding:5px;
+}
+.refundList:hover {
+    cursor: pointer;
+    background-color: #079737;
+    color:white;
+}
+.processed {
+    padding: 5px;
+    color: grey;
+}
+    .processed:hover {
+        color:white;
+        cursor: pointer;
+        background-color: #079737;
+    }
+.spinnermain-container {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 999;
+    top: 50%;
+    left: 50%;
+}
+.ui-splitbutton-menubutton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: solid 1px #8f8a12 !important;
+}
+.ui-splitbutton .ui-button, .ui-splitbutton .ui-paginator-element {
+    background-color: #8f8a12 !important;
+}

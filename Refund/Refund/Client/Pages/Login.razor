@@ -1,0 +1,143 @@
+﻿@using System.Net.Http
+@using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager NavigationManager
+@layout LoginLayout
+@using KNUST_Medical_Refund.Shared.Models
+@inject HttpClient Http
+@using System.IdentityModel.Tokens.Jwt;
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@inject NotificationService notificationService
+@page "/"
+<EditForm Model="@user" OnValidSubmit="@loginAuth">
+    <DataAnnotationsValidator />
+    <div id="form" style="font-family: Quicksand, sans-serif;background-color: rgba(63,58,75,0.43);width: 457px;padding: 40px;">
+        <center>
+            <h1 id="head" style="color: rgb(255,255,255);font-size: 34px;">LOGIN</h1> <br>
+            @*<span style="color:#003445">Sign in to start processing staff Medical Refund Requests.</span>*@
+        </center>
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4"><img class="img-fluid" id="image" src="/images/logo.png"></div>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" id="formum" placeholder="username" @oninput="@(args => usernameInput(args.Value.ToString()))" @onkeydown="@Enter" />
+            <ValidationMessage For=@(() => user.Username) />
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" id="formum2" placeholder="Password" @oninput="@(args => passwordInput(args.Value.ToString()))" @onkeydown="@Enter" />
+            <ValidationMessage For=@(() => user.Password) />
+        </div>
+        @if (IsVisible)
+        {
+            <div class="spinnermain-container">
+                <SpinKitCircle />
+            </div>
+        }
+        else
+        {
+            <RadzenButton Text="SIGN IN" Click="loginAuth" Style="width: 100%;height: 100%;margin-bottom: 10px;background-color: #079737;color: rgb(255,255,255);font-size: 22px;" />
+        }
+
+    </div>
+</EditForm>
+@code {
+    @using Newtonsoft.Json;
+    @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+    public AuthUser user = new AuthUser();
+    protected bool IsVisible { get; set; }
+    NotificationMessage notificationMessage = new NotificationMessage();
+
+    protected override void OnInitialized()
+    {
+        IsVisible = false;
+        SpinnerService.OnShow += ShowSpinner;
+        SpinnerService.OnHide += HideSpinner;
+    }
+    public async Task loginAuth()
+    {
+        ShowSpinner();
+        try
+        {
+            //var responseMain = await Http.PostAsJsonAsync("api/tokens", user);
+            //if (responseMain.IsSuccessStatusCode)
+            //{
+            AuthUser authenticatedUser = new AuthUser
+                {
+                    AccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyYmUyYTk1OC0zOGY2LTRkZjUtOTM0OC0yOTFhMWUzNzJkMzAiLCJpYXQiOiIxMy8wMi8yMDIzIDM6MDg6MDAgcG0iLCJ1c2VyaWQiOiIxIiwicGFzc3dvcmQiOiIxMDIwMjAiLCJyb2xlIjoiMSIsImdyb3VwIjoiMSIsImV4cCI6MTY3NzUxMDQ4MCwiaXNzIjoiTURGIEFVVEggU0VSVkVSIiwiYXVkIjoiS05VU1QgTWVkaWNhbCBSZWZ1bmQifQ.OXIrrnMfNpfS-TnIVRIRcr4GwjZwQCXQ2rcgIAF9FL4",
+                    expiry = DateTime.MaxValue,
+                    Fullname = "Test",
+                    Group = "1",
+                    Role = "1",
+                    UserId = 0,
+                    Username = "igrid"
+
+                };
+
+            //await responseMain.Content.ReadFromJsonAsync<AuthUser>();
+
+            string json = JsonConvert.SerializeObject(authenticatedUser);
+            await sessionStorage.SetItemAsync<string>("userCred", json);
+            await sessionStorage.SetItemAsync<bool>("notified", false);
+            NavigationManager.NavigateTo("main");
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(authenticatedUser.AccessToken) as JwtSecurityToken;
+            string userid = jwtToken.Claims.First(claim => claim.Type == "userid").Value;
+            string role = jwtToken.Claims.First(claim => claim.Type == "role").Value;
+            string group = jwtToken.Claims.First(claim => claim.Type == "group").Value;
+            //}
+            //else if (responseMain.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            //{
+            //    notificationMessage.Detail = "Please make sure you have internet accesss and your login credentials are correct !!! ";
+            //    notificationMessage.Summary = "Authentication Error";
+            //    notificationMessage.Severity = NotificationSeverity.Error;
+            //    notificationMessage.Duration = 5000;
+
+            //    await ShowNotification(notificationMessage);
+            //}
+        }
+        catch
+        {
+            notificationMessage.Detail = "Please make sure you have internet accesss and your login credentials are correct !!! ";
+            notificationMessage.Summary = "Authentication Error";
+            notificationMessage.Severity = NotificationSeverity.Error;
+            notificationMessage.Duration = 5000;
+
+            await ShowNotification(notificationMessage);
+        }
+        HideSpinner();
+    }
+    public void ShowSpinner()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+    public void HideSpinner()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+    async Task ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+    public void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            loginAuth();
+        }
+    }
+    void usernameInput(string value)
+    {
+        user.Username = value;
+        StateHasChanged();
+    }
+    void passwordInput(string value)
+    {
+        user.Password = value;
+        StateHasChanged();
+    }
+}

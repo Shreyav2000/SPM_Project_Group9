@@ -1,0 +1,265 @@
+﻿@page "/main"
+@using Radzen
+@using Radzen.Blazor
+@using System.Globalization;
+@inject HttpClient Http
+@using KNUST_Medical_Refund.Shared.Models
+@inject DialogService dialogService
+@inject TooltipService tooltipService
+@inject NotificationService notificationService
+@using Newtonsoft.Json;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@using System.Text
+
+<div class="container-fluid">
+    @if (IsVisible)
+    {
+<div id="loading-div-background">
+    <div id="loading-div" class="ui-corner-all">
+        <div class="spinnermain-container">
+            <SpinKitCircle />
+        </div>
+        <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+    </div>
+</div>}
+    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-dark mb-0">Dashboard</h3>
+        <RadzenDatePicker @bind-Value="selectedDate" TValue="DateTime" DateFormat="MMMM, yyyy" ShowTimeOkButton="true" Change="getData"></RadzenDatePicker>
+        <a class="btn btn-primary btn-sm d-none d-sm-inline-block" role="button" href="#" style="visibility: hidden;"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+    </div>
+    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+        @if (user.Role == "head")
+        {
+            <p>The following statistics are based on inputs of all users of the Medical Refund Verification platform during the month of <b>@selectedDate.ToString("MMMMM, yyyy")</b></p>
+        }
+        else
+        {
+
+            <p>
+                The following statistics are based on all your inputs during the month of <b>@selectedDate.ToString("MMMMM, yyyy")</b>
+            </p>
+        }
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="card shadow border-left-primary py-2">
+                <div class="card-body">
+                    <div class="row align-items-center no-gutters">
+                        <div class="col mr-2">
+                            <div class="text-uppercase text-primary font-weight-bold text-xs mb-1"><span>no. of approved documents</span></div>
+                            <div class="text-dark font-weight-bold h5 mb-0"><span>@summary.approvedDocuments</span></div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-calendar fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="card shadow border-left-success py-2">
+                <div class="card-body">
+                    <div class="row align-items-center no-gutters">
+                        <div class="col mr-2">
+                            <div class="text-uppercase text-success font-weight-bold text-xs mb-1"><span>no. of declined documents</span></div>
+                            <div class="text-dark font-weight-bold h5 mb-0"><span>@summary.declinedDocuments</span></div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="card shadow border-left-warning py-2">
+                <div class="card-body">
+                    <div class="row align-items-center no-gutters">
+                        <div class="col mr-2">
+                            <div class="text-uppercase text-warning font-weight-bold text-xs mb-1"><span>no. of Protest Requests</span></div>
+                            <div class="text-dark font-weight-bold h5 mb-0"><span>@summary.protests</span></div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-comments fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3 mb-4">
+            <div class="card shadow border-left-info py-2">
+                <div class="card-body">
+                    <div class="row align-items-center no-gutters">
+                        <div class="col mr-2">
+                            <div class="text-uppercase text-info font-weight-bold text-xs mb-1"><span>Total approved</span></div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="text-dark font-weight-bold h5 mb-0 mr-3"><span> @FormatAsUSD(summary.totalApproved)</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto"><i class="fas fa-clipboard-list fa-2x text-gray-300"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #8a1f19;">
+                    <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Refund Overview</h6>
+                </div>
+                <RadzenChart>
+                    <RadzenLineSeries Smooth="@smooth" Data="@summary.declined" CategoryProperty="Date" Title="Declined" LineType="LineType.Dashed" ValueProperty="Revenue">
+                        <RadzenMarkers MarkerType="MarkerType.Square" />
+                    </RadzenLineSeries>
+                    <RadzenLineSeries Smooth="@smooth" Data="@summary.approved" CategoryProperty="Date" Title="Approved" ValueProperty="Revenue">
+                        <RadzenMarkers MarkerType="MarkerType.Circle" />
+                    </RadzenLineSeries>
+                    <RadzenCategoryAxis Padding="50" FormatString="{0:dd/MM/yyyy}" />
+                    <RadzenValueAxis Formatter="@FormatAsUSD">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Amount in GH¢" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3" style="background-color: #d8cd03;">
+                    <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Top Drugs</h6>
+                </div>
+                <div class="card-body">
+                    @if (summary.topRefundeds != null)
+                    {
+                        for (int i = 0; i < summary.topRefundeds.Count; i++)
+                        {
+                            <h4 class="small font-weight-bold">@summary.topRefundeds[i].item<span class="float-right">@(summary.topRefundeds[i].rate + "%")</span></h4>
+                            <div class="progress mb-4">
+                                <div class="@classes[i]" aria-valuenow="@summary.topRefundeds[i].rate" aria-valuemin="0" aria-valuemax="100" style="width: @summary.topRefundeds[i].rate%;"><span class="sr-only">@(summary.topRefundeds[i].rate + "%")</span></div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3" style="background-color: #079737;">
+                    <h6 class="text-primary font-weight-bold m-0" style="color:white !important;">Common Supporting Documents</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @if (summary.common != null)
+                        {
+                            for (int i = 0; i < summary.common.Count; i++)
+                            {
+                                <div class="col-lg-6 mb-4">
+                                    <div class="@classes2[i]">
+                                        <div class="card-body">
+                                            <p class="m-0">@summary.common[i].document.TypeName</p>
+                                            <p class="text-white-50 small m-0">@summary.common[i].number instances</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    bool smooth = true;
+    NotificationMessage notificationMessage = new NotificationMessage();
+    public AuthUser user = new AuthUser();
+    public Summary summary = new Summary();
+    public DateTime selectedDate;
+    public List<string> classes = new List<string>();
+    public List<string> classes2 = new List<string>();
+    protected bool IsVisible { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        classes.Add("progress-bar bg-danger");
+        classes.Add("progress-bar bg-warning");
+        classes.Add("progress-bar bg-primary");
+        classes.Add("progress-bar bg-success");
+        classes.Add("progress-bar bg-warning");
+
+        classes2.Add("card text-white bg-secondary shadow");
+        classes2.Add("card text-white bg-success shadow");
+        classes2.Add("card text-white bg-info shadow");
+        classes2.Add("card text-white bg-warning shadow");
+
+        SpinnerService.OnShow += ShowSpinner;
+        SpinnerService.OnHide += HideSpinner;
+        selectedDate = DateTime.Now;
+
+        summary.topRefundeds = new List<TopRefunded>();
+        summary.common = new List<CommonDoc>();
+
+        string json = await sessionStorage.GetItemAsync<string>("userCred");
+        if (!String.IsNullOrEmpty(json))
+        {
+            user = JsonConvert.DeserializeObject<AuthUser>(json);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        //notificationMessage.Detail = "There are pending medical refund requests to process!";
+        //notificationMessage.Summary = "Pending Requests";
+        //notificationMessage.Severity = NotificationSeverity.Info;
+        //notificationMessage.Duration = 5000;
+
+        await getData();
+    }
+
+    string FormatAsUSD(object value)
+    {
+        string newvalue = ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+        return "GH¢ " + newvalue.Substring(1);
+    }
+
+    async Task ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    async Task getData()
+    {
+        ShowSpinner();
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/summary/filter?month=" + selectedDate.Month + "&year=" + selectedDate.Year);
+
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", user.AccessToken);
+
+            using var httpResponse = await Http.SendAsync(request);
+
+            summary = await httpResponse.Content.ReadFromJsonAsync<Summary>();
+        }
+        catch { }
+        HideSpinner();
+    }
+
+    public void ShowSpinner()
+    {
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void HideSpinner()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+}
