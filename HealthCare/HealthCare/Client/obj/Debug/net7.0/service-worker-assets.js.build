@@ -97,6 +97,22 @@
       "url": "_framework\/Microsoft.AspNetCore.Metadata.dll"
     },
     {
+      "hash": "sha256-kjwlL5HW6OPAERbDnxbmT7PoXqcO94FvbixEL3HZ4bA=",
+      "url": "_framework\/Microsoft.EntityFrameworkCore.dll"
+    },
+    {
+      "hash": "sha256-z+H1jiJEKO1ysnYDAyoMWccFGrlHxQAxva1ryBZHen8=",
+      "url": "_framework\/Microsoft.EntityFrameworkCore.Abstractions.dll"
+    },
+    {
+      "hash": "sha256-tiD1Xg\/wcoUkJVBDtLfs5EiB1IwSUm0d\/lPffRVbKOc=",
+      "url": "_framework\/Microsoft.Extensions.Caching.Abstractions.dll"
+    },
+    {
+      "hash": "sha256-xNEDLuTrpWv6Lq76qNCi\/PYwN6Ev6cjFAzNQPsAKMfg=",
+      "url": "_framework\/Microsoft.Extensions.Caching.Memory.dll"
+    },
+    {
       "hash": "sha256-PqQvp77oZ4+uuy2ElXk8AU9I6RfZSf18UGTrd4rulOo=",
       "url": "_framework\/Microsoft.Extensions.Configuration.dll"
     },
@@ -865,19 +881,19 @@
       "url": "_framework\/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-w3jQrcW18sDXUIAE2yZgdJJO5OM84D6Z+LOLtuTyJwA=",
+      "hash": "sha256-n0Ghdl1FEB2lXNA9Be8DzwBK0\/2XqWuFxAuDqRdBHKw=",
       "url": "_framework\/HealthCare.Shared.dll"
     },
     {
-      "hash": "sha256-J6iHCsBgdGUzmWd3s0Q6VuG42XCJH+sgOTiOtBqV3LI=",
+      "hash": "sha256-r2Qq65SQMFfEAmuFlj4A3S1Q8fZ0bvx2p0gsukHIfvc=",
       "url": "_framework\/HealthCare.Shared.pdb"
     },
     {
-      "hash": "sha256-fKKHtTmWLQor6+6IKOOkbfzFyGlyB\/fo5EIF+mPUb+E=",
+      "hash": "sha256-vHxmPcZ833BmMoHKxzYXk1CsqqAJgXySJgLQAuMxBCU=",
       "url": "_framework\/HealthCare.Client.dll"
     },
     {
-      "hash": "sha256-8XQ7VyTVmVkPu\/JKvBL3fNgQXpTZ8XUpz9t5bQxW8Ww=",
+      "hash": "sha256-\/9mcTjnuWRfbZ574CSYtTMYUyypFOCfSGNHN+ysMgJw=",
       "url": "_framework\/HealthCare.Client.pdb"
     },
     {
@@ -885,9 +901,9 @@
       "url": "_framework\/blazor.webassembly.js"
     },
     {
-      "hash": "sha256-H01\/3fTZjee76YOydRGeEqcQTbTDZtaK5kzkytEKim4=",
+      "hash": "sha256-TxBx3EK0nL4zXivK0kLNVTRdrYn3sKV3J9iLuLT2EJM=",
       "url": "_framework\/blazor.boot.json"
     }
   ],
-  "version": "mzBCu+A7"
+  "version": "\/X1RswAA"
 };

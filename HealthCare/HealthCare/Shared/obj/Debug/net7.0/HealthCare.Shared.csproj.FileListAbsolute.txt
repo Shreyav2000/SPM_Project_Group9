@@ -10,3 +10,15 @@ C:\Users\barhen\source\repos\HealthCare\HealthCare\Shared\obj\Debug\net7.0\Healt
 C:\Users\barhen\source\repos\HealthCare\HealthCare\Shared\obj\Debug\net7.0\refint\HealthCare.Shared.dll
 C:\Users\barhen\source\repos\HealthCare\HealthCare\Shared\obj\Debug\net7.0\HealthCare.Shared.pdb
 C:\Users\barhen\source\repos\HealthCare\HealthCare\Shared\obj\Debug\net7.0\ref\HealthCare.Shared.dll
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\bin\Debug\net7.0\HealthCare.Shared.deps.json
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\bin\Debug\net7.0\HealthCare.Shared.dll
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\bin\Debug\net7.0\HealthCare.Shared.pdb
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\HealthCare.Shared.csproj.AssemblyReference.cache
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\HealthCare.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\HealthCare.Shared.AssemblyInfoInputs.cache
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\HealthCare.Shared.AssemblyInfo.cs
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\HealthCare.Shared.csproj.CoreCompileInputs.cache
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\HealthCare.Shared.dll
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\refint\HealthCare.Shared.dll
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\HealthCare.Shared.pdb
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Shared\obj\Debug\net7.0\ref\HealthCare.Shared.dll

@@ -13,6 +13,10 @@
       "Microsoft.AspNetCore.Components.Web.dll": "sha256-UZqIo7mXzs725Ue0bwmQCHGFmUbf9ISmmgJcPmK4G5c=",
       "Microsoft.AspNetCore.Components.WebAssembly.dll": "sha256-O+b5Wry0nfi1jJsRcx5gMTmufddRxDTcFS+QUtACR9k=",
       "Microsoft.AspNetCore.Metadata.dll": "sha256-yKXiy5bHeZc3n7OK1T+dXnCaUgdD\/oucHL4X86LFzww=",
+      "Microsoft.EntityFrameworkCore.dll": "sha256-kjwlL5HW6OPAERbDnxbmT7PoXqcO94FvbixEL3HZ4bA=",
+      "Microsoft.EntityFrameworkCore.Abstractions.dll": "sha256-z+H1jiJEKO1ysnYDAyoMWccFGrlHxQAxva1ryBZHen8=",
+      "Microsoft.Extensions.Caching.Abstractions.dll": "sha256-tiD1Xg\/wcoUkJVBDtLfs5EiB1IwSUm0d\/lPffRVbKOc=",
+      "Microsoft.Extensions.Caching.Memory.dll": "sha256-xNEDLuTrpWv6Lq76qNCi\/PYwN6Ev6cjFAzNQPsAKMfg=",
       "Microsoft.Extensions.Configuration.dll": "sha256-PqQvp77oZ4+uuy2ElXk8AU9I6RfZSf18UGTrd4rulOo=",
       "Microsoft.Extensions.Configuration.Abstractions.dll": "sha256-CnS3b9EMFQmETBUVEgtcron4DBsfFdcVt3zfCP6Uflg=",
       "Microsoft.Extensions.Configuration.Binder.dll": "sha256-nkrNWc55xbXZ6YCUrPD6yHmiJjZA\/QRVC+\/2CJrgsZw=",
@@ -198,15 +202,15 @@
       "mscorlib.dll": "sha256-T52Qf1cS\/UysEoWOoE2ptEJEXfGpanQX5KNLyDiLv1E=",
       "netstandard.dll": "sha256-p32h5P3QmHJ\/FGoeE6m7f5g\/8ng2PSPGZktHyMadvIs=",
       "System.Private.CoreLib.dll": "sha256-6MwQcyKbqBsoZYOcD9fQJ4iKcn1qMmWRWVEkU2LLCb0=",
-      "HealthCare.Shared.dll": "sha256-w3jQrcW18sDXUIAE2yZgdJJO5OM84D6Z+LOLtuTyJwA=",
-      "HealthCare.Client.dll": "sha256-fKKHtTmWLQor6+6IKOOkbfzFyGlyB\/fo5EIF+mPUb+E="
+      "HealthCare.Shared.dll": "sha256-cgpge+ZnYP3ch\/FOCwOITSVmcoIs8fvgQTs3imE2fyc=",
+      "HealthCare.Client.dll": "sha256-pkZklc\/RCyrHL8tygdUkdiu9mRpxLsiDjhPKiCxiVN8="
     },
     "extensions": null,
     "lazyAssembly": null,
     "libraryInitializers": null,
     "pdb": {
-      "HealthCare.Shared.pdb": "sha256-J6iHCsBgdGUzmWd3s0Q6VuG42XCJH+sgOTiOtBqV3LI=",
-      "HealthCare.Client.pdb": "sha256-8XQ7VyTVmVkPu\/JKvBL3fNgQXpTZ8XUpz9t5bQxW8Ww="
+      "HealthCare.Shared.pdb": "sha256-lI9+V8\/y7z3WiPJ9UwjDA0AdcE1QCW19T8FYi5cPpdI=",
+      "HealthCare.Client.pdb": "sha256-vgh8lh9Y1+tSz0sKqGyBMUhUy2AiUODU0Kq\/WfRn\/Gk="
     },
     "runtime": {
       "dotnet.7.0.2.ls8jxvz5mw.js": "sha256-4mh03qTse0uNR+dQ6ydExm4jJXph0RE8zGNCtF0jiNA=",
