@@ -13,13 +13,14 @@ namespace HealthCare.Server.Methods
     public class AuthRepo : IAuthService
     {
         private readonly HealthcareContext m_context;
-        private readonly IConfiguration m_configuration;
+        private readonly ITokenService m_tokenService;
 
-        public AuthRepo(HealthcareContext a_context, IConfiguration a_configuration)
+        public AuthRepo(HealthcareContext a_context,ITokenService a_tokenService)
         {
             m_context = a_context;
-            m_configuration = a_configuration;
+            m_tokenService = a_tokenService;
         }
+
         /// <summary>
         /// Returns the status of a user account
         /// </summary>
@@ -41,7 +42,6 @@ namespace HealthCare.Server.Methods
         /// <param name="a_username"></param>
         /// <param name="a_password"></param>
         /// <returns>strings</returns>
-        /// <exception cref="NotImplementedException"></exception>
         public async Task<string> Authenticate(string a_username, string a_password)
         {
             var user = await GetUserAsync(a_username, a_password);
@@ -50,25 +50,8 @@ namespace HealthCare.Server.Methods
             {
                 return null;
             }
-            //create claims details based on the user information
-            var claims = new[] {
-                    //new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("userid", user.UserId.ToString()),
-                    new Claim("role", user.RoleId.ToString()),
-                    new Claim("username", user.Username),
-                   };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(m_configuration["Jwt:Key"]!));
-
-            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(m_configuration["Jwt:Issuer"], m_configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(14), signingCredentials: signIn);
-            string authString = new JwtSecurityTokenHandler().WriteToken(token);
-            
-
-            return authString;
+            return m_tokenService.GenerateToken(user);
         }
 
         /// <summary>
@@ -77,6 +60,10 @@ namespace HealthCare.Server.Methods
         /// returns AuthEnums.successful if the account was created successfully
         public AuthEnums CreateUser(User a_user)
         {
+            if (AccountStatus(null, a_user.Username) == AuthEnums.Found)
+                return AuthEnums.Registered;
+
+            a_user.Role = m_context.UserRoles.First(i => i.RoleId== a_user.RoleId);
             a_user.Password = BCrypt.Net.BCrypt.HashPassword(a_user.Password);
             m_context.Users.Add(a_user);
 
@@ -87,11 +74,6 @@ namespace HealthCare.Server.Methods
                 return AuthEnums.Successful;
             }
             return AuthEnums.Error;
-        }
-
-        public void CreateUser()
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -112,7 +94,6 @@ namespace HealthCare.Server.Methods
         /// Gets the list of all users
         /// </summary>
         /// <returns>List<Usert></returns>
-        /// <exception cref="NotImplementedException"></exception>
         public List<User> GetUsers()
         {
             throw new NotImplementedException();
@@ -120,7 +101,6 @@ namespace HealthCare.Server.Methods
         /// <summary>
         /// Locks or disables a user account
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
         public void LockUser()
         {
             throw new NotImplementedException();
@@ -134,14 +114,21 @@ namespace HealthCare.Server.Methods
         }
         private async Task<User> GetUserAsync(string username, string password)
         {
-            string pa = await m_context.Users.Where(u => u.Username == username).Select(u => u.Password).FirstAsync();
-            bool verified = BCrypt.Net.BCrypt.Verify(password, pa);
-            if (verified)
+            try
             {
-                return await m_context.Users.FirstAsync(u => u.Username == username);
-            }
-            else
+                string pa = await m_context.Users.Where(u => u.Username == username).Select(u => u.Password).FirstAsync();
+                bool verified = BCrypt.Net.BCrypt.Verify(password, pa);
+                if (verified)
+                {
+                    return await m_context.Users.FirstAsync(u => u.Username == username);
+                }
+                else
+                {
+                    return null;
+                }
+            }catch(Exception ex)
             {
+                //possible is user not found 
                 return null;
             }
         }

@@ -1,21 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HealthCare.Shared.Models;
+namespace HealthCare.Shared.Models; 
 
 public partial class Prescription
 {
-    public int PrescriptionId { get; set; }
+    public int Id { get; set; }
 
-    public int DrugId { get; set; }
+    public int? PatientId { get; set; }
 
-    public int RecordId { get; set; }
+    public string? PatientNo { get; set; }
 
-    public int Quantity { get; set; }
+    public int? ConsId { get; set; }
 
-    public string? Instructions { get; set; }
+    public string? PrescriptionSessionId { get; set; }
 
-    public virtual Drug Drug { get; set; } = null!;
+    public int? DoctorRequesting { get; set; }
 
-    public virtual MedicalRecord Record { get; set; } = null!;
+    public string? DoctorDetails { get; set; }
+
+    public DateTime? TransDate { get; set; }
+
+    public DateOnly? DrugsRefillDate { get; set; }
+
+    public bool? SendSms { get; set; }
+
+    public int? NotifyViaSmsaheadDays { get; set; }
+
+    public bool? SendEmail { get; set; }
+
+    public int? NotifyViaEmailaheadDays { get; set; }
+
+    public bool? IsActive { get; set; }
 }

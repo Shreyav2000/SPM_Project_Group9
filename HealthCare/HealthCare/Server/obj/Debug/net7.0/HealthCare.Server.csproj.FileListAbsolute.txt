@@ -588,3 +588,4 @@ C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCar
 C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Server\obj\Debug\net7.0\HealthCare.Server.pdb
 C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Server\obj\Debug\net7.0\HealthCare.Server.genruntimeconfig.cache
 C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Server\obj\Debug\net7.0\ref\HealthCare.Server.dll
+C:\Users\barhen\source\repos\Shreyav2000\SPM_Project_Group9\HealthCare\HealthCare\Server\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
