@@ -19,14 +19,11 @@ namespace HealthCare.Server.Controllers.Auth
     public class TokensController : ControllerBase
     {
         private readonly IAuthService m_authService;
-        private readonly ITokenService m_tokenService;
-        private readonly IPermissionService m_permission;
-
+        private readonly Methods.Validator m_validator;
         public TokensController(IAuthService a_authService, ITokenService tokenService,IPermissionService a_permission)
         {
             m_authService = a_authService;
-            m_tokenService = tokenService;
-            m_permission= a_permission;
+            m_validator = new Methods.Validator(tokenService, a_permission);
         }
 
         [HttpPost, Route("authenticate")]
@@ -51,22 +48,10 @@ namespace HealthCare.Server.Controllers.Auth
         public async Task<IActionResult> SetupAccount(User a_userData)
         {
             string token = Request.Headers[HeaderNames.Authorization]!;
-            
-            //Valids access token supplied
-            var tokenStatus = m_tokenService.ValidateToken(token);
-            if (tokenStatus != AuthEnums.Valid)
-            {
-                string response = tokenStatus == AuthEnums.Expired ? Constants.c_expiredToken : Constants.c_brokenToken;
-                return BadRequest(response);
-            }
-            //Gets role id from the token
-            int? roleId = m_tokenService.GetRoleFromToken(token);
-            if (roleId == null)
-                return BadRequest(Constants.c_unauthorzied);
-            
-            //Checks if you has the required permission to continue
-            if(!m_permission.CheckAuthorization(roleId.Value,22))
-                return BadRequest(Constants.c_unauthorzied);
+
+            string? validationResult = m_validator.Validate(token, 22);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
 
             if (a_userData != null && a_userData.Username != null && a_userData.Password != null)
             {

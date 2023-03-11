@@ -80,14 +80,14 @@ namespace HealthCare.Server.Methods
         /// Deletes a user account
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        public void DeleteUser()
+        public void DeleteUser(int a_id)
         {
             throw new NotImplementedException();
         }
 
         public User GetUser(int id)
         {
-            throw new NotImplementedException();
+            return m_context.Users.First(i => i.UserId == id);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace HealthCare.Server.Methods
         /// <returns>List<Usert></returns>
         public List<User> GetUsers()
         {
-            throw new NotImplementedException();
+            return m_context.Users.ToList();
         }
         /// <summary>
         /// Locks or disables a user account

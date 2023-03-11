@@ -5,7 +5,7 @@
       "url": "css\/app.css"
     },
     {
-      "hash": "sha256-z8OR40MowJ8GgK6P89Y+hiJK5+cclzFHzLhFQLL92bg=",
+      "hash": "sha256-SiIVMGgRhdXjKSTIddX7mh9IbOXVcwQWc7\/p4nS6D\/0=",
       "url": "css\/bootstrap\/bootstrap.min.css"
     },
     {
@@ -853,7 +853,7 @@
       "url": "_framework\/System.Private.CoreLib.dll"
     },
     {
-      "hash": "sha256-4mh03qTse0uNR+dQ6ydExm4jJXph0RE8zGNCtF0jiNA=",
+      "hash": "sha256-w6LJ8\/fN66yyhSE7gfqh2sQryEoI0a5DAgwhYofSU0k=",
       "url": "_framework\/dotnet.7.0.2.ls8jxvz5mw.js"
     },
     {
@@ -881,19 +881,19 @@
       "url": "_framework\/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-n0Ghdl1FEB2lXNA9Be8DzwBK0\/2XqWuFxAuDqRdBHKw=",
+      "hash": "sha256-GyLx6lkBtPmfa3xbIQb2xdnBGMbmpLgi\/bsvhzLVTP0=",
       "url": "_framework\/HealthCare.Shared.dll"
     },
     {
-      "hash": "sha256-r2Qq65SQMFfEAmuFlj4A3S1Q8fZ0bvx2p0gsukHIfvc=",
+      "hash": "sha256-bJBtBmyZYfGYagn6nT85UXWG1U5exjhYh15kntg6tNo=",
       "url": "_framework\/HealthCare.Shared.pdb"
     },
     {
-      "hash": "sha256-vHxmPcZ833BmMoHKxzYXk1CsqqAJgXySJgLQAuMxBCU=",
+      "hash": "sha256-uBQvx\/lvSWLHeiRglIQOrw8wsAruXM51yfH+S49aR98=",
       "url": "_framework\/HealthCare.Client.dll"
     },
     {
-      "hash": "sha256-\/9mcTjnuWRfbZ574CSYtTMYUyypFOCfSGNHN+ysMgJw=",
+      "hash": "sha256-gdih48tYtHnJRv+2JPXRB54cjQwIAZ8HfJMQpyMh+Ts=",
       "url": "_framework\/HealthCare.Client.pdb"
     },
     {
@@ -901,9 +901,9 @@
       "url": "_framework\/blazor.webassembly.js"
     },
     {
-      "hash": "sha256-TxBx3EK0nL4zXivK0kLNVTRdrYn3sKV3J9iLuLT2EJM=",
+      "hash": "sha256-GSI9p9VoW\/reTro58WHFBzGEsA+pa2XGGrZTFxn36xA=",
       "url": "_framework\/blazor.boot.json"
     }
   ],
-  "version": "\/X1RswAA"
+  "version": "xaQpyos2"
 };

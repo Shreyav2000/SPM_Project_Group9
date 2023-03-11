@@ -15,11 +15,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 builder.Services.AddEntityFrameworkMySql().AddDbContext<HealthcareContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("Connection1"), new MariaDbServerVersion(new Version())));
 builder.Services.AddScoped<IAuthService, AuthRepo>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IDrugService, DrugService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
