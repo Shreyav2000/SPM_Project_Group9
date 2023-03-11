@@ -32,8 +32,6 @@ bld/
 [Oo]ut/
 [Ll]og/
 [Ll]ogs/
-bin/
-obj/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -363,3 +361,32 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/HealthCare/HealthCare/Client/obj/Debug/net7.0/HealthCare.Client.assets.cache
+/HealthCare/HealthCare/Client/obj/Debug/net7.0/HealthCare.Client.csproj.AssemblyReference.cache
+/HealthCare/HealthCare/Client/obj/Debug/net7.0/HealthCare.Client.GeneratedMSBuildEditorConfig.editorconfig
+/HealthCare/HealthCare/Client/obj/Release/net7.0/HealthCare.Client.assets.cache
+/HealthCare/HealthCare/Client/obj/Release/net7.0/HealthCare.Client.GeneratedMSBuildEditorConfig.editorconfig
+/HealthCare/HealthCare/Server/obj/Debug/net7.0/HealthCare.Server.assets.cache
+/HealthCare/HealthCare/Server/obj/Debug/net7.0/HealthCare.Server.GeneratedMSBuildEditorConfig.editorconfig
+/HealthCare/HealthCare/Server/obj/Debug/net7.0/HealthCare.Server.csproj.AssemblyReference.cache
+/HealthCare/HealthCare/Server/obj/Release/net7.0/HealthCare.Server.assets.cache
+/HealthCare/HealthCare/Server/obj/Release/net7.0/HealthCare.Server.GeneratedMSBuildEditorConfig.editorconfig
+/HealthCare/HealthCare/Server/obj/HealthCare.Server.csproj.nuget.dgspec.json
+/HealthCare/HealthCare/Server/obj/project.assets.json
+/HealthCare/HealthCare/Server/obj/project.nuget.cache
+/HealthCare/HealthCare/Shared/obj/Debug/net7.0/HealthCare.Shared.assets.cache
+/HealthCare/HealthCare/Shared/obj/Debug/net7.0/HealthCare.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/HealthCare/HealthCare/Client/obj/HealthCare.Client.csproj.nuget.dgspec.json
+/HealthCare/HealthCare/Client/obj/project.assets.json
+/HealthCare/HealthCare/Client/obj/project.nuget.cache
+/HealthCare/HealthCare/Shared/obj/Release/net7.0/HealthCare.Shared.GeneratedMSBuildEditorConfig.editorconfig
+/.vs/VSWorkspaceState.json
+/.vs/SPM_Project_Group9/v17/.wsuo
+/HealthCare/HealthCare/Shared/obj/Release/net7.0/HealthCare.Shared.assets.cache
+/HealthCare/HealthCare/Shared/obj/HealthCare.Shared.csproj.nuget.dgspec.json
+/.vs/slnx.sqlite
+/HealthCare/HealthCare/Shared/obj/project.assets.json
+/HealthCare/HealthCare/Shared/obj/project.nuget.cache
+/.vs/SPM_Project_Group9/FileContentIndex/9f290810-4563-44cd-8bfc-476f86046bd7.vsidx
+/.vs/SPM_Project_Group9/FileContentIndex/bb5d1a2f-bd72-4df0-913b-16fbed08328d.vsidx
+/.vs/SPM_Project_Group9/FileContentIndex/f86624ca-538d-43d2-9086-6ee4facc040e.vsidx
