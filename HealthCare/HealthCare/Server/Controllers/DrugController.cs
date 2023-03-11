@@ -21,7 +21,10 @@ namespace HealthCare.Server.Controllers
             m_service = a_drugService;
             m_validator = new Methods.Validator(a_tokenService, a_permission);
         }
-
+        /// <summary>
+        /// Endpoint to create a new drug
+        /// </summary>
+        /// <param name="a_drug"></param>
         [Authorize]
         [HttpPost, Route("create")]
         public async Task<IActionResult> NewDrug(DrugModel a_drug)
@@ -36,6 +39,10 @@ namespace HealthCare.Server.Controllers
 
             return BadRequest("Error occurred, please try again later");
         }
+        /// <summary>
+        /// endpoint to decomission a drug
+        /// </summary>
+        /// <param name="a_drugId"></param>
         [Authorize]
         [HttpPut, Route("decomission")]
         public async Task<IActionResult> DecomissionDrug([FromBody]string a_drugId)
@@ -50,6 +57,10 @@ namespace HealthCare.Server.Controllers
 
             return BadRequest("Error occurred, please try again later");
         }
+        /// <summary>
+        /// Endpoint to reinstate a decomissioned drug
+        /// </summary>
+        /// <param name="a_drugId"></param>
         [Authorize]
         [HttpPut, Route("reinstate")]
         public async Task<IActionResult> ReinstateDrug([FromBody] string a_drugId)
@@ -64,6 +75,10 @@ namespace HealthCare.Server.Controllers
 
             return BadRequest("Error occurred, please try again later");
         }
+        /// <summary>
+        /// Endpoint to mark drug needed for refill
+        /// </summary>
+        /// <param name="a_drugId"></param>
         [Authorize]
         [HttpPut, Route("markrefill")]
         public async Task<IActionResult> MarkForRefillDrug([FromBody] string a_drugId)
@@ -78,6 +93,10 @@ namespace HealthCare.Server.Controllers
 
             return BadRequest("Error occurred, please try again later");
         }
+        /// <summary>
+        /// Endpoint to restock drugs
+        /// </summary>
+        /// <param name="a_item"></param>
         [Authorize]
         [HttpPut, Route("restock")]
         public async Task<IActionResult> RestockDrug(StockItem a_item)
@@ -92,6 +111,10 @@ namespace HealthCare.Server.Controllers
 
             return BadRequest("Error occurred, please try again later");
         }
+        /// <summary>
+        /// Endpoint point to set expired drugs
+        /// </summary>
+        /// <param name="expiryitem"></param>
         [Authorize]
         [HttpPut, Route("setExpired")]
         public async Task<IActionResult> RestockDrug(Expiryitem expiryitem)
@@ -106,6 +129,9 @@ namespace HealthCare.Server.Controllers
 
             return BadRequest("Error occurred, please try again later");
         }
+        /// <summary>
+        /// Endpoint to get list of drugs
+        /// </summary>
         [Authorize]
         [HttpGet, Route("list")]
         public ActionResult<List<Drug>> GetDrugs()
@@ -117,6 +143,10 @@ namespace HealthCare.Server.Controllers
 
             return Ok(m_service.GetDrugs());
         }
+        /// <summary>
+        /// Endpoint to update drug details
+        /// </summary>
+        /// <param name="a_drug"></param>
         [Authorize]
         [HttpPut, Route("update")]
         public ActionResult<List<Drug>> UpdateDrugs(DrugModel a_drug)
