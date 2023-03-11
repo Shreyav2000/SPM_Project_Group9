@@ -39,6 +39,7 @@ public partial class HealthcareContext : DbContext
     public virtual DbSet<Drugbill> Drugbills { get; set; }
 
     public virtual DbSet<Drugbrand> Drugbrands { get; set; }
+    public virtual DbSet<DrugStock> DrugStocks{ get; set; }
 
     public virtual DbSet<Drugitem> Drugitems { get; set; }
 
@@ -287,7 +288,18 @@ public partial class HealthcareContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("drugname");
         });
+        modelBuilder.Entity<DrugStock>(entity =>
+        {
+            entity.HasKey(e => e.DrugId).HasName("PRIMARY");
 
+            entity.ToTable("drugstock");
+
+            entity.Property(e => e.DrugId)
+                .HasMaxLength(50)
+                .HasColumnName("drugItem");
+            entity.Property(e => e.Quantity)
+                .HasColumnName("quantity");
+        });
         modelBuilder.Entity<Drugbill>(entity =>
         {
             entity.HasKey(e => new { e.BranchId, e.ReceiptId })
@@ -327,10 +339,6 @@ public partial class HealthcareContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("BrandID");
             entity.Property(e => e.BrandName).HasMaxLength(225);
-            entity.Property(e => e.ItemId)
-                .HasMaxLength(15)
-                .IsFixedLength()
-                .HasColumnName("ItemID");
         });
 
         modelBuilder.Entity<Drugitem>(entity =>
@@ -341,9 +349,10 @@ public partial class HealthcareContext : DbContext
 
             entity.Property(e => e.ItemId)
                 .ValueGeneratedNever()
-                .HasColumnType("bigint(20)");
+                .HasMaxLength(150);
             entity.Property(e => e.DrugCodes).HasMaxLength(50);
-            entity.Property(e => e.DrugLevel).HasMaxLength(3);
+            entity.Property(e => e.OutOfService);
+            entity.Property(e => e.Refill);
             entity.Property(e => e.Price).HasPrecision(18, 2);
             entity.Property(e => e.QtyPerBasicPackageForm).HasPrecision(18, 2);
             entity.Property(e => e.StrengthUnitId)
@@ -363,12 +372,12 @@ public partial class HealthcareContext : DbContext
                 .IsFixedLength();
             entity.Property(e => e.ExpDate).HasColumnType("datetime");
             entity.Property(e => e.ItemId)
-                .HasMaxLength(10)
+                .HasMaxLength(150)
                 .IsFixedLength()
                 .HasColumnName("ItemID");
             entity.Property(e => e.ManDate).HasColumnType("datetime");
+            entity.Property(e => e.DateModified).HasColumnType("datetime");
             entity.Property(e => e.Quantity)
-                .HasMaxLength(10)
                 .IsFixedLength();
             entity.Property(e => e.Shelf)
                 .HasMaxLength(10)

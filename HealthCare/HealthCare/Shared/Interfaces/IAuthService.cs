@@ -15,7 +15,7 @@ namespace HealthCare.Shared.Interfaces
         List<User> GetUsers();
         AuthEnums CreateUser(User a_user);
         void UpdateUser();
-        void DeleteUser();
+        void DeleteUser(int a_id);
         void LockUser();
         AuthEnums AccountStatus(int? a_id,string? a_username);
     }
