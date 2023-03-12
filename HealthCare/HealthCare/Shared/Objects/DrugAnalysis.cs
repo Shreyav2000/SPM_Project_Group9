@@ -11,6 +11,7 @@ namespace HealthCare.Shared.Objects
     {
         public List<Expiryitem> ExpiredDrugs { get; set; }
         public string MostPurchasedDrug { get; set; }
+        public string MostPrescribedDrug { get; set; }
         public List<Drug> ReplenishedDrugs { get; set; }
         public string? MostExpensiveDrug { get; set; }
     }
