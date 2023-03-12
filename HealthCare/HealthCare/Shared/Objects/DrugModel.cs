@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HealthCare.Shared.Models;
 
-namespace HealthCare.Shared.Models
+namespace HealthCare.Shared.Objects
 {
     public class DrugModel
     {
         public Drug Drug { get; set; }
-        public Drugitem Drugitem { get; set; }
         public DrugStock Stock { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HealthCare.Shared.Enums;
 using HealthCare.Shared.Interfaces;
 using HealthCare.Shared.Models;
+using HealthCare.Shared.Objects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -160,6 +161,21 @@ namespace HealthCare.Server.Controllers
                 return Ok("Drug records successfully updated");
 
             return BadRequest("Error occurred, please try again later");
+        }
+        /// <summary>
+        /// Endpoint to drug analysis
+        /// </summary>
+        /// <param name="a_drug"></param>
+        [Authorize]
+        [HttpGet, Route("performance/{a_start}/{a_end}")]
+        public ActionResult<DrugAnalysis> Analysis(DateTime a_start,DateTime a_end)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 11);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            return Ok(m_service.GetAnalysis(a_start, a_end));
         }
     }
 }

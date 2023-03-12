@@ -41,7 +41,7 @@ public partial class HealthcareContext : DbContext
     public virtual DbSet<Drugbrand> Drugbrands { get; set; }
     public virtual DbSet<DrugStock> DrugStocks{ get; set; }
 
-    public virtual DbSet<Drugitem> Drugitems { get; set; }
+    //public virtual DbSet<Drugitem> Drugitems { get; set; }
 
     public virtual DbSet<Expiryitem> Expiryitems { get; set; }
 
@@ -287,6 +287,9 @@ public partial class HealthcareContext : DbContext
             entity.Property(e => e.Drugname)
                 .HasMaxLength(255)
                 .HasColumnName("drugname");
+            entity.Property(e => e.OutOfService);
+            entity.Property(e => e.Refill);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
         });
         modelBuilder.Entity<DrugStock>(entity =>
         {
@@ -341,25 +344,25 @@ public partial class HealthcareContext : DbContext
             entity.Property(e => e.BrandName).HasMaxLength(225);
         });
 
-        modelBuilder.Entity<Drugitem>(entity =>
-        {
-            entity.HasKey(e => e.ItemId).HasName("PRIMARY");
+        //modelBuilder.Entity<Drugitem>(entity =>
+        //{
+        //    entity.HasKey(e => e.ItemId).HasName("PRIMARY");
 
-            entity.ToTable("drugitem");
+        //    entity.ToTable("drugitem");
 
-            entity.Property(e => e.ItemId)
-                .ValueGeneratedNever()
-                .HasMaxLength(150);
-            entity.Property(e => e.DrugCodes).HasMaxLength(50);
-            entity.Property(e => e.OutOfService);
-            entity.Property(e => e.Refill);
-            entity.Property(e => e.Price).HasPrecision(18, 2);
-            entity.Property(e => e.QtyPerBasicPackageForm).HasPrecision(18, 2);
-            entity.Property(e => e.StrengthUnitId)
-                .HasColumnType("int(11)")
-                .HasColumnName("StrengthUnitID");
-            entity.Property(e => e.UsageFormValue).HasPrecision(18, 2);
-        });
+        //    entity.Property(e => e.ItemId)
+        //        .ValueGeneratedNever()
+        //        .HasMaxLength(150);
+        //    entity.Property(e => e.DrugCodes).HasMaxLength(50);
+        //    entity.Property(e => e.OutOfService);
+        //    entity.Property(e => e.Refill);
+        //    entity.Property(e => e.Price).HasPrecision(18, 2);
+        //    entity.Property(e => e.QtyPerBasicPackageForm).HasPrecision(18, 2);
+        //    entity.Property(e => e.StrengthUnitId)
+        //        .HasColumnType("int(11)")
+        //        .HasColumnName("StrengthUnitID");
+        //    entity.Property(e => e.UsageFormValue).HasPrecision(18, 2);
+        //});
 
         modelBuilder.Entity<Expiryitem>(entity =>
         {
