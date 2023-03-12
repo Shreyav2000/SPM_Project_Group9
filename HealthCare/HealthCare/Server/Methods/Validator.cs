@@ -29,7 +29,7 @@ namespace HealthCare.Server.Methods
             if (roleId == null)
                 return Constants.c_unauthorzied;
 
-            //Checks if you has the required permission to continue
+            //Checks if user has the required permission to continue
             if (!m_permission.CheckAuthorization(roleId.Value, a_permissionId))
                 return Constants.c_unauthorzied;
 
