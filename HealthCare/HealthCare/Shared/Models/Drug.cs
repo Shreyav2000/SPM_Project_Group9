@@ -9,6 +9,9 @@ public partial class Drug
     public string DrugId { get; private set; } = string.Empty;
 
     public string? Drugname { get; set; }
+    public decimal? Price { get; set; }
+    public bool OutOfService { get; set; }
+    public bool Refill { get; set; }
 
     public void SetId(string a_drugId)
     {

@@ -1,4 +1,5 @@
 ﻿using HealthCare.Shared.Models;
+using HealthCare.Shared.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,8 @@ namespace HealthCare.Shared.Interfaces
         bool RestockDrug(StockItem a_item);
         bool MarkForRefill(string a_drugId);
         bool MarkAsExpired(Expiryitem a_drug);
-        Drugitem? GetDrugItemById(string a_drugId);
+        DrugAnalysis GetAnalysis(DateTime a_start, DateTime a_end);
+        Drug? GetDrugById(string a_drugId);
         List<Drug> GetDrugByName(string a_name);
         List<Drug> GetDrugs();
     }

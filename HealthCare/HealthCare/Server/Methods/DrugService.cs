@@ -1,5 +1,7 @@
 ﻿using HealthCare.Shared.Interfaces;
 using HealthCare.Shared.Models;
+using HealthCare.Shared.Objects;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthCare.Server.Methods
 {
@@ -24,10 +26,9 @@ namespace HealthCare.Server.Methods
             {
                 string id = $"DR{String.Format("{0:d9}", (DateTime.Now.Ticks / 10) % 1000000000)}";
                 a_drug.Drug.SetId(id);
-                a_drug.Drugitem.SetItemId(id);
+                a_drug.Stock.SetId(id);
                 m_context.Drugs.Add(a_drug.Drug);
-                m_context.Drugitems.Add(a_drug.Drugitem);
-
+                m_context.DrugStocks.Add(a_drug.Stock);
                 if (m_context.SaveChanges() > 0)
                     return true;
             }
@@ -44,7 +45,7 @@ namespace HealthCare.Server.Methods
         /// <returns>True if drug decomissioned successfully</returns>
         public bool DecomissionDrug(string a_drugId)
         {
-            m_context.Drugitems.First(i => i.ItemId == a_drugId).OutOfService = true;
+            m_context.Drugs.First(i => i.DrugId == a_drugId).OutOfService = true;
             if (m_context.SaveChanges() > 0)
                 return true;
             return false;
@@ -56,7 +57,7 @@ namespace HealthCare.Server.Methods
         /// <returns>True if drug reinstated successfully</returns>
         public bool ReinstateDrug(string a_drugId)
         {
-            m_context.Drugitems.First(i => i.ItemId == a_drugId).OutOfService = false;
+            m_context.Drugs.First(i => i.DrugId == a_drugId).OutOfService = false;
             if (m_context.SaveChanges() > 0)
                 return true;
             return false;
@@ -75,9 +76,9 @@ namespace HealthCare.Server.Methods
         /// </summary>
         /// <param name="a_drugId"></param>
         /// <returns></returns>
-        public Drugitem? GetDrugItemById(string a_drugId)
+        public Drug? GetDrugById(string a_drugId)
         {
-            return m_context.Drugitems.FirstOrDefault(i => i.ItemId == a_drugId);
+            return m_context.Drugs.FirstOrDefault(i => i.DrugId == a_drugId);
         }
 
         /// <summary>
@@ -87,11 +88,8 @@ namespace HealthCare.Server.Methods
         /// <returns>True if drug updated successfully</returns>
         public bool UpdateDrug(DrugModel a_drug)
         {
-            Drugitem item = m_context.Drugitems.First(d => d.ItemId == a_drug.Drugitem.ItemId);
             Drug drug = m_context.Drugs.First(d => d.DrugId == a_drug.Drug.DrugId);
-
             drug = a_drug.Drug;
-            item = a_drug.Drugitem;
 
             if (m_context.SaveChanges() > 0)
                 return true;
@@ -105,7 +103,7 @@ namespace HealthCare.Server.Methods
         public bool RestockDrug(StockItem a_item)
         {
             if (a_item.Quantity > 0)
-                m_context.Drugitems.First(i => i.ItemId == a_item.DrugId).Refill = false;
+                m_context.Drugs.First(i => i.DrugId == a_item.DrugId).Refill = false;
 
             m_context.DrugStocks.First(i => i.DrugId == a_item.DrugId).Quantity += a_item.Quantity;
             if (m_context.SaveChanges() > 0)
@@ -119,7 +117,7 @@ namespace HealthCare.Server.Methods
         /// <returns>True if successful</returns>
         public bool MarkForRefill(string a_drugId)
         {
-            m_context.Drugitems.First(i => i.ItemId == a_drugId).Refill = true;
+            m_context.Drugs.First(i => i.DrugId == a_drugId).Refill = true;
             if (m_context.SaveChanges() > 0)
                 return true;
             return false;
@@ -141,11 +139,31 @@ namespace HealthCare.Server.Methods
         /// <summary>
         /// List of all drugs in the system
         /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
         public List<Drug> GetDrugs()
         {
             return m_context.Drugs.ToList();
+        }
+        /// <summary>
+        /// Gets analysis of drugs usuages in the system
+        /// </summary>
+        /// <param name="a_start"></param>
+        /// <param name="a_end"></param>
+        /// <returns>Returns analysis</returns>
+        public DrugAnalysis GetAnalysis(DateTime a_start, DateTime a_end)
+        {
+            DrugAnalysis analysis = new DrugAnalysis();
+            var bills = m_context.Bills.AsNoTracking().Where(t => t.BillDate >= a_start && t.BillDate <= a_end).Select(i => i.BillId).ToList();
+            string? topDrugId =m_context.Billdetails.Where(t => bills.Contains(t.BillId))
+    .GroupBy(t => t.ItemId)
+    .Select(g => new { ItemId = g.Key, Count = g.Count() })
+    .OrderByDescending(g => g.Count)
+    .FirstOrDefault()?.ItemId;
+            var outDrugs = m_context.DrugStocks.Where(i => i.Quantity <= 0).Select(i => i.DrugId).ToList();
+            analysis.ExpiredDrugs = m_context.Expiryitems.Where(i => i.ExpDate > a_start && i.ExpDate < a_end).ToList();
+            analysis.ReplenishedDrugs = m_context.Drugs.AsNoTracking().Where(i => outDrugs.Contains(i.DrugId)).ToList();
+            analysis.MostPurchasedDrug = m_context.Drugs.FirstOrDefault(t => t.DrugId == topDrugId).Drugname;
+            analysis.MostExpensiveDrug = m_context.Drugs.OrderByDescending(d => d.Price).First().Drugname;
+            return analysis;
         }
     }
 }
