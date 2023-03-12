@@ -154,15 +154,22 @@ namespace HealthCare.Server.Methods
             DrugAnalysis analysis = new DrugAnalysis();
             var bills = m_context.Bills.AsNoTracking().Where(t => t.BillDate >= a_start && t.BillDate <= a_end).Select(i => i.BillId).ToList();
             string? topDrugId =m_context.Billdetails.Where(t => bills.Contains(t.BillId))
-    .GroupBy(t => t.ItemId)
-    .Select(g => new { ItemId = g.Key, Count = g.Count() })
-    .OrderByDescending(g => g.Count)
-    .FirstOrDefault()?.ItemId;
+            .GroupBy(t => t.ItemId)
+            .Select(g => new { ItemId = g.Key, Count = g.Count() })
+            .OrderByDescending(g => g.Count)
+            .FirstOrDefault()?.ItemId;
+            var prescriptions = m_context.Prescriptiondetails.AsNoTracking().Where(t => t.Ddate >= a_start && t.Ddate <= a_end).Select(i => i.PrescriptionSessionId).ToList();
+            string mostPrescribedId = m_context.Prescriptiondetails.Where(t => prescriptions.Contains(t.PrescriptionSessionId))
+            .GroupBy(t => t.DrugId)
+            .Select(g => new { ItemId = g.Key, Count = g.Count() })
+            .OrderByDescending(g => g.Count)
+            .First().ItemId;
             var outDrugs = m_context.DrugStocks.Where(i => i.Quantity <= 0).Select(i => i.DrugId).ToList();
             analysis.ExpiredDrugs = m_context.Expiryitems.Where(i => i.ExpDate > a_start && i.ExpDate < a_end).ToList();
             analysis.ReplenishedDrugs = m_context.Drugs.AsNoTracking().Where(i => outDrugs.Contains(i.DrugId)).ToList();
-            analysis.MostPurchasedDrug = m_context.Drugs.FirstOrDefault(t => t.DrugId == topDrugId).Drugname;
+            analysis.MostPurchasedDrug = m_context.Drugs.First(t => t.DrugId == topDrugId).Drugname!;
             analysis.MostExpensiveDrug = m_context.Drugs.OrderByDescending(d => d.Price).First().Drugname;
+            analysis.MostPrescribedDrug = m_context.Drugs.First(t => t.DrugId == mostPrescribedId).Drugname!;
             return analysis;
         }
     }
