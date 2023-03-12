@@ -881,19 +881,19 @@
       "url": "_framework\/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-Ft8c7CPsUPrg9sybhhSI6GuMQ9OjhAOhn88amOFie20=",
+      "hash": "sha256-ePT6\/gQQ7NxIK9tJiAcNJWcHATRSJU+wsKJV9621Iuk=",
       "url": "_framework\/HealthCare.Shared.dll"
     },
     {
-      "hash": "sha256-hpydxp+S9qLDgFudbilv3E9YxC+5hwZsSunqgNdfRxY=",
+      "hash": "sha256-8N0vZyGkB+VKMLinMpqdr8vlWbnWTTai3J28S+lTBRo=",
       "url": "_framework\/HealthCare.Shared.pdb"
     },
     {
-      "hash": "sha256-vKtzC4ziTIkWgqmgPgzopu2op2O\/rgZkZOhQhwt0XDo=",
+      "hash": "sha256-xne3i3n4kR8stEzxa6oWdnHVyxrbsSZyAOj8gZzPeJs=",
       "url": "_framework\/HealthCare.Client.dll"
     },
     {
-      "hash": "sha256-1Cj3iEvJo3FmX847i6SDS5VOYKteBVoqwTK3gUzyQ0c=",
+      "hash": "sha256-e4AvXuRH9q9o4ECRLCnMedjbFzYhqQW4GtMoRFSfoQY=",
       "url": "_framework\/HealthCare.Client.pdb"
     },
     {
@@ -901,9 +901,9 @@
       "url": "_framework\/blazor.webassembly.js"
     },
     {
-      "hash": "sha256-Wmma3CvZKSRU4yAp833vI4pDYnN9geU0J4ORWrK3y0E=",
+      "hash": "sha256-3x+v8o0Rk4FKEI7IHY5c7q2IEHYB02cYWeo84EKK4W8=",
       "url": "_framework\/blazor.boot.json"
     }
   ],
-  "version": "AzUzLFAO"
+  "version": "ngMBHpmd"
 };
