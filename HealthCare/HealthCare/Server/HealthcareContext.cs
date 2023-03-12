@@ -344,26 +344,6 @@ public partial class HealthcareContext : DbContext
             entity.Property(e => e.BrandName).HasMaxLength(225);
         });
 
-        //modelBuilder.Entity<Drugitem>(entity =>
-        //{
-        //    entity.HasKey(e => e.ItemId).HasName("PRIMARY");
-
-        //    entity.ToTable("drugitem");
-
-        //    entity.Property(e => e.ItemId)
-        //        .ValueGeneratedNever()
-        //        .HasMaxLength(150);
-        //    entity.Property(e => e.DrugCodes).HasMaxLength(50);
-        //    entity.Property(e => e.OutOfService);
-        //    entity.Property(e => e.Refill);
-        //    entity.Property(e => e.Price).HasPrecision(18, 2);
-        //    entity.Property(e => e.QtyPerBasicPackageForm).HasPrecision(18, 2);
-        //    entity.Property(e => e.StrengthUnitId)
-        //        .HasColumnType("int(11)")
-        //        .HasColumnName("StrengthUnitID");
-        //    entity.Property(e => e.UsageFormValue).HasPrecision(18, 2);
-        //});
-
         modelBuilder.Entity<Expiryitem>(entity =>
         {
             entity.HasKey(e => e.Nid).HasName("PRIMARY");
@@ -1028,7 +1008,6 @@ public partial class HealthcareContext : DbContext
             entity.Property(e => e.Dosage).HasPrecision(18, 2);
             entity.Property(e => e.DosageUnit).HasMaxLength(20);
             entity.Property(e => e.DrugId)
-                .HasColumnType("int(11)")
                 .HasColumnName("DrugID");
             entity.Property(e => e.EditedBy).HasColumnType("int(11)");
             entity.Property(e => e.EditedDate).HasColumnType("datetime");

@@ -11,7 +11,7 @@ public partial class Prescriptiondetail
 
     public int? ConsId { get; set; }
 
-    public int? DrugId { get; set; }
+    public string? DrugId { get; set; }
 
     public string? ServiceOptionId { get; set; }
 
