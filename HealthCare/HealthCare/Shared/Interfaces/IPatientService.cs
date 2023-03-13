@@ -10,5 +10,6 @@ namespace HealthCare.Shared.Interfaces
     public interface IPatientService
     {
         Task<List<AttendanceObject>> GetAttendance(DateTime a_start,DateTime a_end);
+        Task<List<MedHistory>> GetPatientRecord(int a_patientId);
     }
 }
