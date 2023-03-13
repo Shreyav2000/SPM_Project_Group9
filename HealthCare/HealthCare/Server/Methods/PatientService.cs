@@ -1,15 +1,16 @@
 ﻿using HealthCare.Shared.Interfaces;
+using HealthCare.Shared.Models;
 using HealthCare.Shared.Objects;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthCare.Server.Methods
 {
-    public class AttendanceService : IPatientService
+    public class PatientService : IPatientService
     {
         private readonly HealthcareContext m_context;
-        private readonly ILogger<AttendanceService> m_logger;
+        private readonly ILogger<PatientService> m_logger;
 
-        public AttendanceService(HealthcareContext context, ILogger<AttendanceService> logger)
+        public PatientService(HealthcareContext context, ILogger<PatientService> logger)
         {
             m_context = context;
             m_logger = logger;
@@ -36,6 +37,27 @@ namespace HealthCare.Server.Methods
                           }).ToListAsync();
 
 
+        }
+        /// <summary>
+        /// Gets the medical history of the patient id provided
+        /// </summary>
+        /// <param name="a_patientId"></param>
+        /// <returns>All previous medical records</returns>
+        public async Task<List<MedHistory>> GetPatientRecord(int a_patientId)
+        {
+            return await (
+    from pa in m_context.Patientattendances
+    join s in m_context.Staff on pa.SeenByDoctorId equals s.Staffid
+    join c in m_context.Patientcomplaintnotes on pa.ConsultId equals c.ConsultId
+    join ps in m_context.Prescriptiondetails on pa.ConsultId equals ps.ConsId into prescriptions
+    where pa.PatientId == pa.PatientId
+    select new MedHistory
+    {
+        ConsultId = pa.ConsultId,
+        Complaint = c.Notes,
+        Timestamp = pa.PTime,
+        DoctorName = s.Fname + " " + s.Lname
+    }).ToListAsync();
         }
     }
 }
