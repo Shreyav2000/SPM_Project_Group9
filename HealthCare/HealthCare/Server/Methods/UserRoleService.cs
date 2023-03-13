@@ -12,32 +12,56 @@ using System.Threading.Tasks;
 
 namespace HealthCare.Server.Methods
 {
+    /// <summary>
+    /// Service for managing user roles.
+    /// </summary>
     public class UserRoleService : IUserRoleService
     {
         private readonly HealthcareContext m_context;
         private readonly ILogger<UserRoleService> m_logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserRoleService"/> class.
+        /// </summary>
+        /// <param name="context">The database context.</param>
+        /// <param name="logger">The logger.</param>
         public UserRoleService(HealthcareContext context, ILogger<UserRoleService> logger)
         {
             m_context = context;
             m_logger = logger;
         }
 
+
+        /// <summary>
+        /// Adds a new user role to the database.
+        /// </summary>
+        /// <param name="userRole">The user role to add.</param>
+        /// <returns><c>true</c> if the user role was added successfully,
+        /// otherwise <c>false</c>.</returns>
         public async Task<bool> AddUserRole(UserRole userRole)
         {
             try
             {
                 m_context.UserRoles.AddAsync(userRole);
-                await m_context.SaveChangesAsync();
+               int i = await m_context.SaveChangesAsync();
+                if (i > 0)
                 return true;
             }
             catch (Exception ex)
             {
                 m_logger.LogError(ex, $"Failed to add user role with Id {userRole.RoleName}.");
-                return false;
+
             }
+
+            return false;
         }
 
+        /// <summary>
+        /// Deletes a user role from the database.
+        /// </summary>
+        /// <param name="roleId">The ID of the user role to delete.</param>
+        /// <returns><c>true</c> if the user role was deleted successfully,
+        /// otherwise <c>false</c>.</returns>
         public async Task<bool> DeleteUserRole(int roleId)
         {
             try
@@ -51,14 +75,17 @@ namespace HealthCare.Server.Methods
                 }
 
                 m_context.UserRoles.Remove(userRole);
-                await m_context.SaveChangesAsync();
+                int i = await m_context.SaveChangesAsync();
+                if (i>0)
                 return true;
             }
             catch (Exception ex)
             {
                 m_logger.LogError(ex, $"Failed to delete user role with Id {roleId}.");
-                return false;
+                
             }
+
+            return false;
         }
 
     }

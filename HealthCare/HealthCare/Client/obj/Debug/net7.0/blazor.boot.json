@@ -202,15 +202,15 @@
       "mscorlib.dll": "sha256-T52Qf1cS\/UysEoWOoE2ptEJEXfGpanQX5KNLyDiLv1E=",
       "netstandard.dll": "sha256-p32h5P3QmHJ\/FGoeE6m7f5g\/8ng2PSPGZktHyMadvIs=",
       "System.Private.CoreLib.dll": "sha256-6MwQcyKbqBsoZYOcD9fQJ4iKcn1qMmWRWVEkU2LLCb0=",
-      "HealthCare.Shared.dll": "sha256-FaFeZTB3fOSbusXNiNSJKJss13YBoHqO\/gfRWi0ZuHA=",
-      "HealthCare.Client.dll": "sha256-wJJ40RcTCEUz80lddyG2MxenujY5\/0mURbDhmdyRK2o="
+      "HealthCare.Shared.dll": "sha256-me5vhWQfQjsbNDamhStONMAAtFs2EmpDdwv2Ff6TNdk=",
+      "HealthCare.Client.dll": "sha256-47DD8zYRazgbPRC+8qrS5xLzaID+RLSzrMN8yuYvtec="
     },
     "extensions": null,
     "lazyAssembly": null,
     "libraryInitializers": null,
     "pdb": {
-      "HealthCare.Shared.pdb": "sha256-kmGULM3XtWOB3QrqqG9f4DhZowqyKzC5tkzJ3PG8YrM=",
-      "HealthCare.Client.pdb": "sha256-VXlQ9cRYfsaovTYb5K7h\/gX7wyu4nmiO9mH3+zDouWo="
+      "HealthCare.Shared.pdb": "sha256-1farA0KKfO0AUWUmpLgvbIneM6OQWX8KQtk6+3vL\/IM=",
+      "HealthCare.Client.pdb": "sha256-yVv6yHwyUqAblUlRj4iav6sJwB2TdqLsd0Ve8j47qG8="
     },
     "runtime": {
       "dotnet.7.0.2.svnn7rrq2d.js": "sha256-4mh03qTse0uNR+dQ6ydExm4jJXph0RE8zGNCtF0jiNA=",
