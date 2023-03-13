@@ -9,12 +9,12 @@ namespace HealthCare.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PatientAttendanceController : ControllerBase
+    public class PatientController : ControllerBase
     {
         private readonly Methods.Validator m_validator;
         private readonly IPatientService m_service;
 
-        public PatientAttendanceController(IPatientService a_patientService, ITokenService a_tokenService, IPermissionService a_permission)
+        public PatientController(IPatientService a_patientService, ITokenService a_tokenService, IPermissionService a_permission)
         {
             m_service = a_patientService;
             m_validator = new Methods.Validator(a_tokenService, a_permission);
@@ -35,6 +35,22 @@ namespace HealthCare.Server.Controllers
 
             var attendance = m_service.GetAttendance(a_start, a_end).Result;
             return Ok(attendance);
+        }
+        /// <summary>
+        /// Endpoint to attendance records
+        /// </summary>
+        /// <param name="a_drug"></param>
+        [Authorize]
+        [HttpGet, Route("records/history/{a_id}")]
+        public ActionResult<List<MedHistory>> History(int a_id)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 11);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            var history = m_service.GetPatientRecord(a_id).Result;
+            return Ok(history);
         }
     }
 }
