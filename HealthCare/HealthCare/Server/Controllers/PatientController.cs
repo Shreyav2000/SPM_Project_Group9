@@ -61,7 +61,7 @@ namespace HealthCare.Server.Controllers
         public ActionResult<List<MedHistory>> GetPatient(string a_id)
         {
             string token = Request.Headers[HeaderNames.Authorization]!;
-            string? validationResult = m_validator.Validate(token, 11);
+            string? validationResult = m_validator.Validate(token, 1);
             if (!string.IsNullOrEmpty(validationResult))
                 return BadRequest(validationResult);
 
