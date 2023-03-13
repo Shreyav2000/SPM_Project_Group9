@@ -52,5 +52,22 @@ namespace HealthCare.Server.Controllers
             var history = m_service.GetPatientRecord(a_id).Result;
             return Ok(history);
         }
+        /// <summary>
+        /// Endpoint to look up a patient using their id
+        /// </summary>
+        /// <param name="a_drug"></param>
+        [Authorize]
+        [HttpGet, Route("records/profile/{a_id}")]
+        public ActionResult<List<MedHistory>> GetPatient(string a_id)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 11);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            var history = m_service.GetPatientProfile(a_id);
+            return Ok(history);
+        }
+
     }
 }

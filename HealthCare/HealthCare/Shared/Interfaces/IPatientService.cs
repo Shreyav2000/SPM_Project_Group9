@@ -1,4 +1,5 @@
-﻿using HealthCare.Shared.Objects;
+﻿using HealthCare.Shared.Models;
+using HealthCare.Shared.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace HealthCare.Shared.Interfaces
     {
         Task<List<AttendanceObject>> GetAttendance(DateTime a_start,DateTime a_end);
         Task<List<MedHistory>> GetPatientRecord(int a_patientId);
+        Patient GetPatientProfile(string a_patientId);
     }
 }
