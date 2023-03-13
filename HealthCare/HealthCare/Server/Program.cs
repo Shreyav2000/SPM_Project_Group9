@@ -23,6 +23,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IDrugService, DrugService>();
 builder.Services.AddScoped<IPatientService, AttendanceService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService> ();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
