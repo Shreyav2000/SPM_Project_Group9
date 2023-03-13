@@ -163,19 +163,20 @@ namespace HealthCare.Server.Controllers
             return BadRequest("Error occurred, please try again later");
         }
         /// <summary>
-        /// Endpoint to drug analysis
+        /// Endpoint to get drug record by id
         /// </summary>
-        /// <param name="a_drug"></param>
+        /// <param name="a_drugId"></param>
         [Authorize]
-        [HttpGet, Route("performance/{a_start}/{a_end}")]
-        public ActionResult<DrugAnalysis> Analysis(DateTime a_start,DateTime a_end)
+        [HttpGet, Route("record/{a_drugId}")]
+        public ActionResult<DrugAnalysis> Analysis(string a_drugId)
         {
             string token = Request.Headers[HeaderNames.Authorization]!;
             string? validationResult = m_validator.Validate(token, 11);
             if (!string.IsNullOrEmpty(validationResult))
                 return BadRequest(validationResult);
 
-            return Ok(m_service.GetAnalysis(a_start, a_end));
+            return Ok(m_service.GetDrugById(a_drugId));
         }
+    
     }
 }

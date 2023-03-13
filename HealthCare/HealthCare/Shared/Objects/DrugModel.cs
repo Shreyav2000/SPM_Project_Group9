@@ -9,6 +9,7 @@ namespace HealthCare.Shared.Objects
 {
     public class DrugModel
     {
+        public string DrugId { get; set; }
         public Drug Drug { get; set; }
         public DrugStock Stock { get; set; }
     }
