@@ -39,6 +39,16 @@ namespace HealthCare.Server.Methods
 
         }
         /// <summary>
+        /// Gets the Profile of a patient using the patients's id provided
+        /// </summary>
+        /// <param name="a_name"></param>
+        /// <returns>Patient Profile if found</returns>
+        public Patient GetPatientProfile(string a_name)
+        {
+            return m_context.Patients.FirstOrDefault(n => n.PatientNo == a_name);
+        }
+
+        /// <summary>
         /// Gets the medical history of the patient id provided
         /// </summary>
         /// <param name="a_patientId"></param>
@@ -59,5 +69,6 @@ namespace HealthCare.Server.Methods
         DoctorName = s.Fname + " " + s.Lname
     }).ToListAsync();
         }
+    
     }
 }
