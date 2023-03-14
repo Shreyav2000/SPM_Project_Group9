@@ -177,6 +177,20 @@ namespace HealthCare.Server.Controllers
 
             return Ok(m_service.GetDrugById(a_drugId));
         }
-    
+        /// <summary>
+        /// Endpoint to drug analysis
+        /// </summary>
+        /// <param name="a_drug"></param>
+        [Authorize]
+        [HttpGet, Route("performance/{a_start}/{a_end}")]
+        public ActionResult<DrugAnalysis> Analysis(DateTime a_start, DateTime a_end)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 11);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            return Ok(m_service.GetAnalysis(a_start, a_end));
+        }
     }
 }
