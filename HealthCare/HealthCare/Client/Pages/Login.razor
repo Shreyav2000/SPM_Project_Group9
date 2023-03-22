@@ -1,0 +1,101 @@
+﻿@page "/"
+@namespace HealthCare.Client.Pages
+@inject NavigationManager NavigationManager
+@layout LoginLayout
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@using System.Net.Http
+@using Microsoft.AspNetCore.Components.Forms
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@inject Radzen.NotificationService notificationService
+<header class="header navbar-fixed-top">
+    <div class="container">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#"><img src="logo.png" style="max-height:80px;"/> Team 9 <br /> Healthcare System</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<div class="container login-row">
+
+    <div class="col-sm-7 bannerimg">
+        <img src="img/doctorimage.jpg">
+        <p class="caption">Welcome to the Healthcare Management System designed by team 9</p>
+    </div>
+
+    <div class="col-sm-4">
+        <div class="login-form-box">
+            <div class="login-form">
+                <p class="box-heading">Login</p>
+
+                <div class="col-md-12 caption3"><p>Please enter your credentials below <br>to login</p></div>
+                <form role="form">
+
+                    @if (userCategory == 1)
+                    {
+        <div class="input-field">
+            <div class="col-md-12">
+                <input class="form-control input-lg" name="number" id="HospitalNumber" placeholder="username" type="text" @oninput="@(args => usernameInput(args.Value.ToString()))" @onkeydown="@Enter" />
+            </div>
+        </div>
+                        <div class="input-field">
+                            <div class="col-md-12">
+                                <input class="form-control input-lg" name="number" id="password" placeholder="password" type="password"  @oninput="@(args => passwordInput(args.Value.ToString()))" @onkeydown="@Enter" />
+                            </div>
+                        </div> }
+                    else
+                    {
+        <div class="input-field">
+            <div class="col-md-12">
+                <input class="form-control input-lg" name="number" id="HospitalNumber" placeholder="example@knust.edu.gh" type="text" @oninput="@(args => usernameInput(args.Value.ToString()))" @onkeydown="@Enter" />
+            </div>
+        </div>
+                        <div class="input-field">
+                            <div class="col-md-12">
+                                <input class="form-control input-lg" name="number" id="password" placeholder="password" type="password"  @oninput="@(args => passwordInput(args.Value.ToString()))" @onkeydown="@Enter" />
+                            </div>
+                        </div>}
+                    <div class="input-field">
+                        <div class="col-md-12">
+                            <a style="font-size:small;" href="#">Forgot your username or password? Contact your administrator</a>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <input class="btn login-btn" type="button" value="Sign In" @onclick="loginMethod">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="container">
+    <footer class="copyright">
+        <small><span>Copyright © 2023 ACS 567 Software Project Management Team 9. All Rights Reserved</span></small>
+        <br />
+    </footer>
+</div>
+@if (IsVisible)
+{
+<div id="loading-div-background">
+    <div id="loading-div" class="ui-corner-all">
+        <div class="spinnermain-container">
+            <SpinKitCircle />
+        </div>
+        <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+    </div>
+</div>}
