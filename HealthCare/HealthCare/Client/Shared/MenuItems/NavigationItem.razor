@@ -1,0 +1,27 @@
+﻿<RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Item.Name" Path="@Item.Path" Icon="@Item.Icon">
+    @ChildContent
+</RadzenPanelMenuItem>
+
+@code {
+    [Parameter]
+    public NavItems Item { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Expanded
+    {
+        get
+        {
+            return Item.Expanded;
+        }
+        set
+        {
+            Item.Expanded = value;
+        }
+    }
+
+    [Parameter]
+    public EventCallback<bool> ExpandedChanged { get; set; }
+}

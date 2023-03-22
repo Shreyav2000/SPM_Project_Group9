@@ -1,0 +1,93 @@
+﻿@using Microsoft.AspNetCore.Components
+@using Radzen.Blazor
+@inherits LayoutComponentBase
+@inject NavigationManager UriHelper
+@inject IJSRuntime JSRuntime
+@using HealthCare.Client.Shared.MenuItems
+
+<RadzenDialog />
+<RadzenNotification />
+<RadzenTooltip />
+<RadzenContextMenu />
+
+<RadzenLayout>
+    <RadzenHeader Style="background-color:#21c87a !important;">
+        <ChildContent>
+            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
+                <RadzenColumn Size="5">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                        <RadzenSidebarToggle Click="@(args => { m_sidebarExpanded = !m_sidebarExpanded; m_bodyExpanded = !m_bodyExpanded; })">
+                        </RadzenSidebarToggle>
+                        <RadzenLabel Text="Team 9 Health Care Managemant" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                        </RadzenLabel>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn Size="7">
+                <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+                   <RadzenButton Text="Logout" Style="background-color:white;color:darkred;"/>
+                </RadzenStack>
+            </RadzenColumn>
+            </RadzenRow>
+        </ChildContent>
+    </RadzenHeader>
+    <RadzenBody @ref="@body0" @bind-Expanded="@m_bodyExpanded">
+        <ChildContent>
+            <RadzenContentContainer Name="main">
+                <RadzenRow Gap="2rem" Class="rz-pt-6 rz-px-4 rz-px-sm-8 rz-px-xl-12">
+                    <RadzenColumn Size="12">
+                        <RadzenRow Class="rz-mx-auto" Style="max-width: 1600px;">
+                            @Body
+                        </RadzenRow>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenContentContainer>
+        </ChildContent>
+    </RadzenBody>
+    <RadzenSidebar @ref="@sidebar0" @bind-Expanded="@m_sidebarExpanded" Class="demos-sidebar" style="display: flex; flex-direction: column">
+        <div style="padding: 1rem">
+        </div>
+        <div style="flex: 1; overflow: auto">
+            <RadzenPanelMenu Match="NavLinkMatch.Prefix">
+                @foreach (NavItems category in m_NavMenuItems)
+                {
+                    <NavigationItem @bind-Expanded="@category.Expanded" Item=@category>
+                        @if (category.Children != null)
+                        {
+                            @foreach (var example in category.Children)
+                            {
+                                if (example.Children != null)
+                                {
+                                    <NavigationItem @bind-Expanded="@example.Expanded" Item=@example>
+                                        @foreach (var child in example.Children)
+                                        {
+                                            <NavigationItem @bind-Expanded="@child.Expanded" Item=@child />
+                                        }
+                                    </NavigationItem>
+                                }
+                                else
+                                {
+                                    <NavigationItem @bind-Expanded="@example.Expanded" Item=@example />
+                                }
+                            }
+                        }
+                    </NavigationItem>
+                }
+            </RadzenPanelMenu>
+        </div>
+    </RadzenSidebar>
+</RadzenLayout>
+
+@if (!m_rendered)
+{
+    <div Class="rz-app-loading">
+        <div Class="logo-loading"></div>
+    </div>
+}
+@code {
+
+    RadzenSidebar sidebar0;
+    RadzenBody body0;
+    bool m_sidebarExpanded = true;
+    bool m_bodyExpanded = false;
+    bool m_rendered;
+}

@@ -2,6 +2,7 @@ using Blazored.SessionStorage;
 using BlazorTable;
 using HealthCare.Client;
 using HealthCare.Client.Shared;
+using HealthCare.Client.Shared.MenuItems;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Radzen;
