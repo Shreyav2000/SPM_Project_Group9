@@ -180,7 +180,8 @@ namespace HealthCare.Server.Controllers
         /// <summary>
         /// Endpoint to drug analysis
         /// </summary>
-        /// <param name="a_drug"></param>
+        /// <param name="a_start"></param>
+        /// /// <param name="a_end"></param>
         [Authorize]
         [HttpGet, Route("performance/{a_start}/{a_end}")]
         public ActionResult<DrugAnalysis> Analysis(DateTime a_start, DateTime a_end)
