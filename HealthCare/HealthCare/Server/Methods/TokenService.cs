@@ -62,7 +62,7 @@ namespace HealthCare.Server.Methods
                 var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
                 var token = new JwtSecurityToken(m_configuration["Jwt:Issuer"], m_configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(14), signingCredentials: signIn);
-                return $"Bearer {new JwtSecurityTokenHandler().WriteToken(token)}";
+                return $"{new JwtSecurityTokenHandler().WriteToken(token)}";
             }
             catch (Exception ex)
             {

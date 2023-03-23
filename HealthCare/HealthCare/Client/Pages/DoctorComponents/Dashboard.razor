@@ -1,7 +1,10 @@
 ﻿@page "/dashboard"
 @using System.Text.RegularExpressions
+@using HealthCare.Shared.Objects;
 @using Radzen.Blazor.Rendering
 @layout DoctorLayout
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject HttpClient Http
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" Class="rz-pt-8">
     Welcome
@@ -25,7 +28,7 @@
             </RadzenText>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeSM="3">
-            <RadzenDatePicker TValue="DateTime?" DateFormat="MMMM, yyyy" Value=@m_period Change="@(args => m_period = args)" />
+            <RadzenDatePicker TValue="DateTime?" DateFormat="MMMM, yyyy" @bind-Value=@m_period Change="@(args => getData())" />
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow>
@@ -101,68 +104,32 @@
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow>
-        @*<RadzenColumn Size="12">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.H6">Patient cases </RadzenText>
-                <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowSorting="true">
-                    <Columns>
-                        <RadzenDataGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login" FilterValue="@selectedUser?.Login">
-                            <FilterTemplate>
-                                <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
-                                    <Template Context="user">
-                                        <div Style="white-space: nowrap">
-                                            <img Style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" src=@user.AvatarUrl />@user.Login
-                                        </div>
-                                    </Template>
-                                </RadzenDropDown>
-                            </FilterTemplate>
-                            <Template Context="issue">
-                                <img Style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl /><b>@issue.User.Login</b>
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Issue" Property="Title" Title="Title" Width="400px">
-                            <Template Context="issue">
-                                <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Issue" Property="State" Title="State" Width="120px">
-                            <FilterTemplate>
-                                <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues>
-                                    <Template Context="issueState">
-                                        @issueState.ToString()
-                                    </Template>
-                                </RadzenDropDown>
-                            </FilterTemplate>
-                            <Template Context="issue">
-                                @if (issue.State == IssueState.Open)
-                                {
-                                    <RadzenBadge Text="Open" IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Success" />
-                                }
-                                else
-                                {
-                                    <RadzenBadge Text="Closed" IsPill="true" Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Info" />
-                                }
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Issue" Title="Labels" Sortable="false">
-                            <FilterTemplate>
-                                <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
-                                    <Template Context="label">
-                                        @Regex.Replace(label, ":\\w+:", "")
-                                    </Template>
-                                </RadzenDropDown>
-                            </FilterTemplate>
-
-                            <Template Context="issue">
-                                @foreach (var label in issue.Labels)
-                                {
-                                    <span Class="rz-badge rz-badge-pill rz-mr-1 rz-mb-1" Style="background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
-                                }
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
-                </RadzenDataGrid>
-            </RadzenCard>
-        </RadzenColumn>*@
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H6">Patient cases </RadzenText>
+            <RadzenDataGrid Data=@Attendances Style="height: 500px" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowSorting="true">
+                <Columns>
+                    <RadzenDataGridColumn TItem="AttendanceObject" Title="Patient" Width="200px" Property="AttendanceObject.PatientName">
+                        <Template Context="patient">
+                            <b>@patient.PatientName</b>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AttendanceObject" Property="AttendanceObject.Notes" Title="Cases" Width="400px">
+                        <Template Context="patient">
+                            @patient.Notes
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AttendanceObject" Property="Date" Title="Timestamp" Width="120px">
+                        <Template Context="patient">
+                            <b>@patient.Timestamp</b>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AttendanceObject" Property="Date" Title="Action" Width="120px">
+                        <Template Context="patient">
+                           <RadzenButton Text="Review" Style="background-color:green;"/>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
     </RadzenRow>
 </RadzenStack>

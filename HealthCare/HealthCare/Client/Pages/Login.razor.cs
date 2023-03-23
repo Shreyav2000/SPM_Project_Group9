@@ -60,23 +60,17 @@ namespace HealthCare.Client.Pages
             {
                 authenticatedUser = new User
                 {
+                    UserId = 0,
+                    Role = new UserRole(),
+                    RoleId= 0,
                     Username = email,
                     Password = password
                 };
-                var responseMain = await Http.PostAsJsonAsync("authenticate/paga-user", authenticatedUser);
+                var responseMain = await Http.PostAsJsonAsync("api/Tokens/authenticate", authenticatedUser);
                 if (responseMain.IsSuccessStatusCode)
                 {
-                    authenticatedUser = await responseMain.Content.ReadFromJsonAsync<User>();
-
-                    //string json = JsonConvert.SerializeObject(new CurrentUser
-                    //{
-                    //    accesstoken = authenticatedUser.AccessToken,
-                    //    loginType = authenticatedUser.type == "transcriber" ? 3 : 1,
-                    //    category = authenticatedUser.type == "transcriber" ? "pharmacy" : "admin",
-                    //    fullname = authenticatedUser.Fullname,
-                    //    email = authenticatedUser.email,
-                    //});
-                    //await sessionStorage.SetItemAsync<string>("userInfo", json);
+                    string token = await responseMain.Content.ReadAsStringAsync();
+                    await sessionStorage.SetItemAsync<string>("token", token);
                     //NavigationManager.NavigateTo("/summary");
                 }
                 else if (responseMain.StatusCode == System.Net.HttpStatusCode.BadRequest)

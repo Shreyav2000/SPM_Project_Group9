@@ -1,9 +1,11 @@
-﻿using HealthCare.Shared.Interfaces;
+﻿using HealthCare.Server.Methods;
+using HealthCare.Shared.Interfaces;
 using HealthCare.Shared.Objects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using System.Drawing.Drawing2D;
 
 namespace HealthCare.Server.Controllers
 {
@@ -13,20 +15,39 @@ namespace HealthCare.Server.Controllers
     {
         private readonly Methods.Validator m_validator;
         private readonly IPatientService m_service;
+        private readonly ITokenService m_tokenService;
 
         public PatientController(IPatientService a_patientService, ITokenService a_tokenService, IPermissionService a_permission)
         {
             m_service = a_patientService;
-            m_validator = new Methods.Validator(a_tokenService, a_permission);
+            m_tokenService = a_tokenService;
+            m_validator = new Methods.Validator(m_tokenService, a_permission);
         }
 
+        /// <summary>
+        /// Endpoint to attendance records of patients seen by specific doctor
+        /// </summary>
+        /// <param name="a_drug"></param>
+        [Authorize]
+        [HttpGet, Route("records/doctor/{a_start}/{a_end}")]
+        public ActionResult<List<AttendanceObject>> RecordByDoctor(DateTime a_start, DateTime a_end)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            int? doctor = m_tokenService.GetUserIdFromToken(token);
+            string? validationResult = m_validator.Validate(token, 11);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            var attendance = m_service.GetAttendance(a_start, a_end, doctor).Result;
+            return Ok(attendance);
+        }
         /// <summary>
         /// Endpoint to attendance records
         /// </summary>
         /// <param name="a_drug"></param>
         [Authorize]
         [HttpGet, Route("records/{a_start}/{a_end}")]
-        public  ActionResult<AttendanceObject> Analysis(DateTime a_start, DateTime a_end)
+        public ActionResult<List<AttendanceObject>> Analysis(DateTime a_start, DateTime a_end)
         {
             string token = Request.Headers[HeaderNames.Authorization]!;
             string? validationResult = m_validator.Validate(token, 11);
@@ -39,7 +60,7 @@ namespace HealthCare.Server.Controllers
         /// <summary>
         /// Endpoint to attendance records
         /// </summary>
-        /// <param name="a_drug"></param>
+        /// <param name="a_id"></param>
         [Authorize]
         [HttpGet, Route("records/history/{a_id}")]
         public ActionResult<List<MedHistory>> History(int a_id)

@@ -14,6 +14,7 @@ namespace HealthCare.Shared.Objects
         public int? DoctorId { get; set; }
         public string? DoctorName { get; set; }
         public int? ConsultId { get; set; }
+        public string? Notes { get; set; }
 
     }
 }
