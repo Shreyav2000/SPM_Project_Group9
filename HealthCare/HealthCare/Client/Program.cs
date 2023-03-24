@@ -2,6 +2,8 @@ using Blazored.SessionStorage;
 using BlazorTable;
 using HealthCare.Client;
 using HealthCare.Client.Shared;
+using HealthCare.Server.Methods;
+using HealthCare.Shared.Interfaces;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Radzen;
@@ -11,6 +13,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<SpinnerService>();
 builder.Services.AddScoped<NotificationService>();

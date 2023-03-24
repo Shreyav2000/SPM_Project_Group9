@@ -26,8 +26,11 @@ namespace HealthCare.Server.Methods
             return await (from pa in m_context.Patientattendances
                           join p in m_context.Patients on pa.PatientId equals p.PatientId
                           join s in m_context.Staff on pa.SeenByDoctorId equals s.Staffid
+                          join n in m_context.Patientcomplaintnotes on pa.ConsultId equals n.ConsultId into b
+                          where pa.PTime.Date >= a_start && pa.PTime.Date <= a_end
                           select new AttendanceObject
                           {
+                              Notes = b.FirstOrDefault(t => !string.IsNullOrEmpty(t.Notes)).Notes,
                               ConsultId = pa.ConsultId,
                               DoctorId = pa.SeenByDoctorId,
                               PatientId = pa.PatientNo,
@@ -38,6 +41,32 @@ namespace HealthCare.Server.Methods
 
 
         }
+        /// <summary>
+        /// Gets attendance for patient during a specified period seen by specific doctor
+        /// </summary>
+        /// <param name="a_start"></param>
+        /// <param name="a_end"></param>
+        /// <param name="a_doctorId"></param>
+        /// <returns>List of Attendance records</returns>
+        public async Task<List<AttendanceObject>> GetAttendance(DateTime a_start, DateTime a_end, int? a_doctorId)
+        {
+            return await (from pa in m_context.Patientattendances
+                          join p in m_context.Patients on pa.PatientId equals p.PatientId
+                          join s in m_context.Staff on pa.SeenByDoctorId equals s.Staffid
+                          join n in m_context.Patientcomplaintnotes on pa.ConsultId equals n.ConsultId into b
+                          where s.Staffid == a_doctorId && pa.PTime.Date >= a_start && pa.PTime.Date <= a_end
+                          select new AttendanceObject
+                          {
+                              Notes = b.FirstOrDefault().Notes,
+                              ConsultId = pa.ConsultId,
+                              DoctorId = pa.SeenByDoctorId,
+                              PatientId = pa.PatientNo,
+                              Timestamp = pa.PTime,
+                              PatientName = p.Fname + " " + p.Lname,
+                              DoctorName = s.Fname + " " + s.Lname
+                          }).ToListAsync();
+        }
+
         /// <summary>
         /// Gets the Profile of a patient using the patients's id provided
         /// </summary>
@@ -69,6 +98,6 @@ namespace HealthCare.Server.Methods
         DoctorName = s.Fname + " " + s.Lname
     }).ToListAsync();
         }
-    
+
     }
 }

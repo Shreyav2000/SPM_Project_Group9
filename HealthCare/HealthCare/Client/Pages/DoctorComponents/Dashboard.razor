@@ -1,0 +1,108 @@
+﻿@page "/doctor/dashboard"
+@using System.Text.RegularExpressions
+@using HealthCare.Shared.Objects;
+@using Radzen.Blazor.Rendering
+@layout DoctorLayout
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject HttpClient Http
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@inject DialogService dialogService
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" Class="rz-pt-8">
+    Welcome
+</RadzenText>
+
+<RadzenStack Gap="1rem" Style="position: relative">
+    <RadzenCard Visible=@m_fetchingData Style="z-index: 3; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5)">
+        <RadzenCard Visible=@(m_error == null) Class="rz-my-12 rz-mx-auto rz-p-12" Style="width: 80%">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-my-12">Hang on fetching data...</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle1">Page @m_currentPage of @m_totalPages</RadzenText>
+            <RadzenProgressBar Value=@m_currentPage Max=@m_totalPages ShowValue="false" Style="display: inline-block; width: 180px; margin-top: 16px" />
+        </RadzenCard>
+        <RadzenCard Visible=@(m_error != null) Class="rz-my-12 rz-mx-auto rz-p-12" Style="width: 80%">
+            <RadzenText TextStyle="TextStyle.H6" Class="rz-my-8">An error has occurred: @m_error. Try reloading your browser.</RadzenText>
+        </RadzenCard>
+    </RadzenCard>
+    <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Class="rz-mb-4">
+        <RadzenColumn Size="12" SizeSM="9">
+            <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">
+                Here you get to see a summary of your activities over then selected period.
+            </RadzenText>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeSM="3">
+            <RadzenDatePicker TValue="DateTime?" DateFormat="MMMM, yyyy" @bind-Value=@m_period Change="@(args => getData())" />
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="4">
+            <RadzenCard Style="height: 280px">
+                <RadzenText TextStyle="TextStyle.H6">Top Drugs Prescribed</RadzenText>
+                <RadzenChart Style="width: 100%; height: 200px">
+                    <RadzenDonutSeries Data=@TopPrescribedDrugs CategoryProperty="Drug" ValueProperty="Count" Title="Drugs" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="4">
+            <RadzenCard Style="height: 280px">
+                <RadzenText TextStyle="TextStyle.H6">Frequent Cases</RadzenText>
+                <RadzenChart Style="width: 100%; height: 200px">
+                    <RadzenPieSeries Data=@Cases CategoryProperty="Case" ValueProperty="Count" Title="Issues" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+            <RadzenCard Style="position: relative;height: 280px">
+                <RadzenText TextStyle="TextStyle.H6">Total Cases</RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 1.5rem; top: 1rem;">@TotalCases.Sum(t => t.Count)</RadzenText>
+                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
+                    <RadzenColumnSeries Data=@TotalCases ValueProperty="Count" CategoryProperty="Day" Title="Cases" Fill="var(--rz-success)" />
+                    <RadzenValueAxis Visible="false" />
+                    <RadzenCategoryAxis Visible="false" />
+                    <RadzenColumnOptions Margin="10" />
+                    <RadzenLegend Visible="false" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H6">Patient cases </RadzenText>
+            <RadzenDataGrid Data=@Attendances Style="height: 500px" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowSorting="true">
+                <Columns>
+                    <RadzenDataGridColumn TItem="AttendanceObject" Title="Patient" Width="200px" Property="AttendanceObject.PatientName">
+                        <Template Context="patient">
+                            <b>@patient.PatientName</b>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AttendanceObject" Property="Notes" Title="Cases" Width="400px">
+                        <Template Context="patient">
+                            @patient.Notes
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AttendanceObject" Property="Date" Title="Timestamp" Width="120px">
+                        <Template Context="patient">
+                            <b>@patient.Timestamp</b>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="AttendanceObject" Property="Date" Title="Action" Width="120px">
+                        <Template Context="patient">
+                           <RadzenButton Text="Review" Style="background-color:green;" Click="(() => openDialog(patient))"/>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
+@if (IsVisible)
+{
+<div id="loading-div-background">
+    <div id="loading-div" class="ui-corner-all">
+        <div class="spinnermain-container">
+            <SpinKitCircle />
+        </div>
+        <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+    </div>
+</div>
+}

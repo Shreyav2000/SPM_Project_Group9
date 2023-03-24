@@ -22,6 +22,7 @@ builder.Services.AddScoped<IAuthService, AuthRepo>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IDrugService, DrugService>();
+builder.Services.AddScoped<IDoctorAnalysis,DoctorService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService> ();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IStaffService, StaffService>();

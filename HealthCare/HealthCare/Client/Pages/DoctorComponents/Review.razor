@@ -1,0 +1,64 @@
+﻿@page "/patient/review/{record}"
+@inject HttpClient Http
+@inject DialogService dialogService
+@inject TooltipService tooltipService
+@using HealthCare.Shared.Objects;
+@using Newtonsoft.Json;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavigationManager
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+
+
+<RadzenCard Style="margin-bottom: 20px;">
+    <div class="row">
+        <div class="col-md-4 align-items-center d-flex">
+            <RadzenLabel Text="Date Attended Hospital" />
+        </div>
+        <div class="col-md-8">
+            <RadzenLabel Text=@record.Timestamp.ToLongDateString() />
+        </div>
+    </div>
+  
+        <RadzenFieldset Text="Patient's Info" Style="width:100%;">
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Name of Patient" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cFullname" @bind-Value="record.PatientName" />
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 align-items-center d-flex">
+                    <RadzenLabel Text="Patient's ID Number" />
+                </div>
+                <div class="col-md-8">
+                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cID" @bind-Value="@record.PatientId" />
+                </div>
+            </div>
+         
+        </RadzenFieldset>
+        <RadzenFieldset>
+
+                <div class="row">
+                    <div class="col-md-4 align-items-center d-flex">
+                        <RadzenLabel Text="Notes" /> <b></b>
+                    </div>
+                    <div class="col-md-8">
+                        <RadzenTextArea Disabled="true" @bind-Value="@record.Notes" Cols="50" Rows="10" Style="margin-bottom: 20px;margin-top:20px;" />
+                    </div>
+                </div>
+         
+        </RadzenFieldset>
+
+</RadzenCard>
+<center>
+    <RadzenButton Click="@( () => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+</center>
+@code {
+    [Parameter]
+    public AttendanceObject record { get; set; }
+
+}
