@@ -30,7 +30,7 @@ namespace HealthCare.Server.Methods
                           where pa.PTime.Date >= a_start && pa.PTime.Date <= a_end
                           select new AttendanceObject
                           {
-                              Notes = b.FirstOrDefault().Notes,
+                              Notes = b.FirstOrDefault(t => !string.IsNullOrEmpty(t.Notes)).Notes,
                               ConsultId = pa.ConsultId,
                               DoctorId = pa.SeenByDoctorId,
                               PatientId = pa.PatientNo,

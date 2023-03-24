@@ -1,4 +1,5 @@
-﻿using HealthCare.Shared.Enums;
+﻿using HealthCare.Server.Methods;
+using HealthCare.Shared.Enums;
 using HealthCare.Shared.Interfaces;
 using HealthCare.Shared.Models;
 using HealthCare.Shared.Objects;
@@ -16,11 +17,15 @@ namespace HealthCare.Server.Controllers
     {
         private readonly Methods.Validator m_validator;
         private readonly IDrugService m_service;
+        private readonly IDoctorAnalysis m_doctorAnalysis;
+        private readonly ITokenService m_tokenService;
 
-        public DrugController(IDrugService a_drugService, ITokenService a_tokenService, IPermissionService a_permission)
+        public DrugController(IDrugService a_drugService, ITokenService a_tokenService, IPermissionService a_permission, IDoctorAnalysis doctorAnalysis, ITokenService tokenService)
         {
             m_service = a_drugService;
             m_validator = new Methods.Validator(a_tokenService, a_permission);
+            m_doctorAnalysis = doctorAnalysis;
+            m_tokenService = tokenService;
         }
         /// <summary>
         /// Endpoint to create a new drug

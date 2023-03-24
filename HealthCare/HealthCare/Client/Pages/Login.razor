@@ -4,12 +4,15 @@
 @layout LoginLayout
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @using System.Net.Http
+@using HealthCare.Shared.Interfaces;
 @using Microsoft.AspNetCore.Components.Forms
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @using Faso.Blazor.SpinKit
 @inject SpinnerService SpinnerService
 @inject Radzen.NotificationService notificationService
+@inject ITokenService tokenService
+
 <header class="header navbar-fixed-top">
     <div class="container">
         <nav class="navbar navbar-default">

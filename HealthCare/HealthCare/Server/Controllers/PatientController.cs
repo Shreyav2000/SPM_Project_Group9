@@ -25,23 +25,6 @@ namespace HealthCare.Server.Controllers
         }
 
         /// <summary>
-        /// Endpoint to attendance records of patients seen by specific doctor
-        /// </summary>
-        /// <param name="a_drug"></param>
-        [Authorize]
-        [HttpGet, Route("records/doctor/{a_start}/{a_end}")]
-        public ActionResult<List<AttendanceObject>> RecordByDoctor(DateTime a_start, DateTime a_end)
-        {
-            string token = Request.Headers[HeaderNames.Authorization]!;
-            int? doctor = m_tokenService.GetUserIdFromToken(token);
-            string? validationResult = m_validator.Validate(token, 11);
-            if (!string.IsNullOrEmpty(validationResult))
-                return BadRequest(validationResult);
-
-            var attendance = m_service.GetAttendance(a_start, a_end, doctor).Result;
-            return Ok(attendance);
-        }
-        /// <summary>
         /// Endpoint to attendance records
         /// </summary>
         /// <param name="a_drug"></param>

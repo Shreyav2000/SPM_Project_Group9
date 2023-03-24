@@ -1,10 +1,13 @@
-﻿@page "/dashboard"
+﻿@page "/doctor/dashboard"
 @using System.Text.RegularExpressions
 @using HealthCare.Shared.Objects;
 @using Radzen.Blazor.Rendering
 @layout DoctorLayout
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject HttpClient Http
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@inject DialogService dialogService
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" Class="rz-pt-8">
     Welcome
@@ -32,65 +35,11 @@
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow>
-        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
-            <RadzenCard Style="position: relative;">
-                <RadzenText TextStyle="TextStyle.H6">Open Cases</RadzenText>
-                <RadzenText TextStyle="TextStyle.H2" Class="rz-color-success" Style="position: absolute; right: 1.5rem; top: 1rem;">66</RadzenText>
-                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
-                    @*<RadzenColumnSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-success)" />*@
-                    <RadzenValueAxis Visible="false" />
-                    <RadzenCategoryAxis Visible="false" />
-                    <RadzenColumnOptions Margin="10" />
-                    <RadzenLegend Visible="false" />
-                </RadzenChart>
-            </RadzenCard>
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
-            <RadzenCard Style="position: relative;">
-                <RadzenText TextStyle="TextStyle.H6">Closed Cases</RadzenText>
-                <RadzenText TextStyle="TextStyle.H2" Class="rz-color-danger" Style="position: absolute; right: 1.5rem; top: 1rem;">80</RadzenText>
-                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
-                    @*<RadzenColumnSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Issues" Fill="var(--rz-danger)" />*@
-                    <RadzenValueAxis Visible="false" />
-                    <RadzenCategoryAxis Visible="false" />
-                    <RadzenColumnOptions Margin="10" />
-                    <RadzenLegend Visible="false" />
-                </RadzenChart>
-            </RadzenCard>
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
-            <RadzenCard Style="position: relative;">
-                <RadzenText TextStyle="TextStyle.H6">Daily Average</RadzenText>
-                <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 1.5rem; top: 1rem;">120</RadzenText>
-                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
-                    @*<RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="var(--rz-success)" />
-                    <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="var(--rz-danger)" />*@
-                    <RadzenValueAxis Visible="false" />
-                    <RadzenCategoryAxis Visible="false" />
-                    <RadzenLegend Visible="false" />
-                </RadzenChart>
-            </RadzenCard>
-        </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
-            <RadzenCard Style="position: relative;">
-                <RadzenText TextStyle="TextStyle.H6">Total Cases</RadzenText>
-                <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 1.5rem; top: 1rem;">120</RadzenText>
-                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
-                    @*<RadzenLineSeries Data=@openIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Open Issues" Smooth="true" Stroke="var(--rz-success)" />
-                    <RadzenLineSeries Data=@closedIssuesByDate ValueProperty="Count" CategoryProperty="Week" Title="Closed Issues" Smooth="true" Stroke="var(--rz-danger)" />*@
-                    <RadzenValueAxis Visible="false" />
-                    <RadzenCategoryAxis Visible="false" />
-                    <RadzenLegend Visible="false" />
-                </RadzenChart>
-            </RadzenCard>
-        </RadzenColumn>
-    </RadzenRow>
-    <RadzenRow>
         <RadzenColumn Size="12" SizeMD="6" SizeLG="4">
             <RadzenCard Style="height: 280px">
                 <RadzenText TextStyle="TextStyle.H6">Top Drugs Prescribed</RadzenText>
                 <RadzenChart Style="width: 100%; height: 200px">
-                    @*<RadzenDonutSeries Data=@labelGroups CategoryProperty="Label" ValueProperty="Count" Title="Issues" Fills=@labelColors />*@
+                    <RadzenDonutSeries Data=@TopPrescribedDrugs CategoryProperty="Drug" ValueProperty="Count" Title="Drugs" />
                 </RadzenChart>
             </RadzenCard>
         </RadzenColumn>
@@ -98,7 +47,20 @@
             <RadzenCard Style="height: 280px">
                 <RadzenText TextStyle="TextStyle.H6">Frequent Cases</RadzenText>
                 <RadzenChart Style="width: 100%; height: 200px">
-                    @*<RadzenPieSeries Data=@openByGroups CategoryProperty="Name" ValueProperty="Count" Title="Issues" />*@
+                    <RadzenPieSeries Data=@Cases CategoryProperty="Case" ValueProperty="Count" Title="Issues" />
+                </RadzenChart>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+            <RadzenCard Style="position: relative;height: 280px">
+                <RadzenText TextStyle="TextStyle.H6">Total Cases</RadzenText>
+                <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 1.5rem; top: 1rem;">@TotalCases.Sum(t => t.Count)</RadzenText>
+                <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
+                    <RadzenColumnSeries Data=@TotalCases ValueProperty="Count" CategoryProperty="Day" Title="Cases" Fill="var(--rz-success)" />
+                    <RadzenValueAxis Visible="false" />
+                    <RadzenCategoryAxis Visible="false" />
+                    <RadzenColumnOptions Margin="10" />
+                    <RadzenLegend Visible="false" />
                 </RadzenChart>
             </RadzenCard>
         </RadzenColumn>
@@ -113,7 +75,7 @@
                             <b>@patient.PatientName</b>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="AttendanceObject" Property="AttendanceObject.Notes" Title="Cases" Width="400px">
+                    <RadzenDataGridColumn TItem="AttendanceObject" Property="Notes" Title="Cases" Width="400px">
                         <Template Context="patient">
                             @patient.Notes
                         </Template>
@@ -125,7 +87,7 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="AttendanceObject" Property="Date" Title="Action" Width="120px">
                         <Template Context="patient">
-                           <RadzenButton Text="Review" Style="background-color:green;"/>
+                           <RadzenButton Text="Review" Style="background-color:green;" Click="(() => openDialog(patient))"/>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -133,3 +95,14 @@
         </RadzenColumn>
     </RadzenRow>
 </RadzenStack>
+@if (IsVisible)
+{
+<div id="loading-div-background">
+    <div id="loading-div" class="ui-corner-all">
+        <div class="spinnermain-container">
+            <SpinKitCircle />
+        </div>
+        <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+    </div>
+</div>
+}
