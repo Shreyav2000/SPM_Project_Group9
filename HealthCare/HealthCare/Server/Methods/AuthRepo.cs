@@ -51,6 +51,9 @@ namespace HealthCare.Server.Methods
                 return null;
             }
             string Token = m_tokenService.GenerateToken(user);
+            user.LastLogin = DateTime.Now;
+            m_context.Users.Update(user);
+            m_context.SaveChanges();
             return m_tokenService.GenerateToken(user);
         }
 
