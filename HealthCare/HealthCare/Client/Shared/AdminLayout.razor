@@ -1,0 +1,29 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@using HealthCare.Client.Shared.MenuItems
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+
+
+
+<div class="sidebar">
+    <ul>
+        <li><a href="/" class="home-link">Home</a></li>
+    </ul>
+    <button @onclick="Logout" class="logout-button">Logout</button>
+</div>
+
+<div class="content">
+    @Body
+</div>
+
+@code {
+    private async Task Logout()
+    {
+        // Clear the user session or authentication token
+        // Redirect to the login page
+        await sessionStorage.ClearAsync();
+        NavigationManager.NavigateTo("/");
+
+    }
+}

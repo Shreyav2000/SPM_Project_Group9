@@ -1,0 +1,122 @@
+﻿@page "/admin/dashboard"
+@layout AdminLayout
+@using HealthCare.Shared.Objects;
+@using HealthCare.Shared.Interfaces
+@using System.Net.Http
+@inject HttpClient httpClient
+@using Newtonsoft.Json;
+@using HealthCare.Shared.Models;
+@using System.Xml.Linq;
+
+
+
+<h1>Admin Dashboard</h1>
+
+@if (showMetrics)
+{
+    <h3>System Metrics</h3>
+    <p>CPU usage: @cpuUsage</p>
+
+}
+
+@if (showActivityLog)
+{
+    <h3>User Activity Log</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Action</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in activityLog)
+            {
+                <tr>
+                    <td>@log.Username</td>
+                    <td>logged in</td>
+                    <td>@log.LastLogin</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button @onclick="ToggleMetrics">Toggle Metrics</button>
+<button @onclick="ToggleActivityLog">Toggle Activity Log</button>
+
+@code {
+    private bool showMetrics = false;
+    private bool showActivityLog = false;
+    private double cpuUsage = 0.0;
+    private List<User> activityLog = new List<User>();
+    private DateTime lastLogin;
+
+    /// <summary>
+    /// Toggles the display of system metrics.
+    /// </summary>
+    private void ToggleMetrics()
+    {
+        showMetrics = !showMetrics;
+    }
+
+    private void ToggleActivityLog()
+    {
+        showActivityLog = !showActivityLog;
+    }
+
+    // Simulate getting system metrics and activity log entries
+    protected override async Task OnInitializedAsync()
+    {
+        await GetLastLogins();
+        await GetSystemMetrics();
+        StateHasChanged();
+    }
+    /// <summary>
+    /// Gets the last login from the API.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the list of last login entries.</returns>
+    async Task GetLastLogins()
+    {
+        var response = await httpClient.GetAsync("api/user/lastlogin");
+        if (response.IsSuccessStatusCode)
+        {
+            activityLog = await response.Content.ReadFromJsonAsync<List<User>>();
+
+        }
+    }
+    async Task GetSystemMetrics()
+    {
+        var response = await httpClient.GetAsync("api/systemmetrics");
+        if (response.IsSuccessStatusCode)
+        {
+            var metrics = await response.Content.ReadFromJsonAsync<SystemMetrics>();
+            cpuUsage = metrics.cpuUsage;
+
+        }
+    }
+
+
+
+    private class ActivityLogEntry
+    {
+        public string User { get; set; }
+        public string Action { get; set; }
+        public DateTime Timestamp { get; set; }
+
+        /**
+ * Constructor for the activity log entry.
+ * 
+ * @param user The user associated with the log entry.
+ * @param action The action associated with the log entry.
+ * @param timestamp The timestamp of the log entry.
+ */
+        public ActivityLogEntry(string user, string action, DateTime timestamp)
+        {
+            User = user;
+            Action = action;
+            Timestamp = timestamp;
+        }
+    }
+}

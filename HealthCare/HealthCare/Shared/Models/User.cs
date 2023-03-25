@@ -16,4 +16,7 @@ public partial class User
     public int RoleId { get; set; }
 
     public virtual UserRole Role { get; set; } = null!;
+
+    public DateTime? LastLogin { get; set; }
+
 }

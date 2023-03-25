@@ -75,6 +75,7 @@ namespace HealthCare.Client.Pages
                         {
                             case 1://Admin
                                 //Todo implement Navigation to Admin Dashboard
+                                NavigationManager.NavigateTo("/admin/dashboard");
                                 break;
                             case 2://Doctor
                                 NavigationManager.NavigateTo("/doctor/dashboard");

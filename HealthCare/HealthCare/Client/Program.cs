@@ -22,4 +22,8 @@ builder.Services.AddScoped<ContextMenuService>();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddBlazorTable();
 
+
+
+
+
 await builder.Build().RunAsync();
