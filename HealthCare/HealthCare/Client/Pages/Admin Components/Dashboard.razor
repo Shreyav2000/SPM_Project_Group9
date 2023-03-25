@@ -2,9 +2,10 @@
 @layout AdminLayout
 @using HealthCare.Shared.Objects;
 @using HealthCare.Shared.Interfaces
-@inject ISystemMetricsService SystemMetricsService
 @using System.Net.Http
 @inject HttpClient httpClient
+@using Newtonsoft.Json;
+@using HealthCare.Shared.Models;
 
 
 
@@ -32,9 +33,9 @@
             @foreach (var log in activityLog)
             {
                 <tr>
-                    <td>@log.User</td>
-                    <td>@log.Action</td>
-                    <td>@log.Timestamp</td>
+                    <td>@log.Username</td>
+                    <td>logged in</td>
+                    <td>@log.LastLogin</td>
                 </tr>
             }
         </tbody>
@@ -45,11 +46,19 @@
 <button @onclick="ToggleActivityLog">Toggle Activity Log</button>
 
 @code {
-    private bool showMetrics = true;
-    private bool showActivityLog = true;
+    private bool showMetrics = false;
+    private bool showActivityLog = false;
     private double cpuUsage = 0.0;
     private double memoryUsage = 0.0;
-    private List<ActivityLogEntry> activityLog = new List<ActivityLogEntry>();
+    private List<User> activityLog = new List<User>();
+    private DateTime lastLogin;
+
+    //private async Task UpdateSystemMetricsAsync()
+    //{
+    //    cpuUsage = await SystemMetricsService.GetCpuUsageAsync();
+    //    memoryUsage = await SystemMetricsService.GetMemoryUsageAsync();
+    //}
+
 
     private void ToggleMetrics()
     {
@@ -64,13 +73,31 @@
     // Simulate getting system metrics and activity log entries
     protected override async Task OnInitializedAsync()
     {
-
-        await Task.Delay(1000);
-        activityLog.Add(new ActivityLogEntry("user1", "logged in", DateTime.Now));
-
-        await Task.Delay(1000);
-        activityLog.Add(new ActivityLogEntry("user2", "viewed dashboard", DateTime.Now));
+        await GetLastLogins();
+        await GetSystemMetrics();
+        StateHasChanged();
     }
+    // Get last login from the API
+    async Task GetLastLogins()
+    {
+        var response = await httpClient.GetAsync("api/user/lastlogin");
+        if (response.IsSuccessStatusCode)
+        {
+            activityLog = await response.Content.ReadFromJsonAsync<List<User>>();
+
+        }
+    }
+    async Task GetSystemMetrics ()
+    {
+        var response = await httpClient.GetAsync("api/systemmetrics");
+        if (response.IsSuccessStatusCode)
+        {
+            var metrics = await response.Content.ReadFromJsonAsync<SystemMetrics>();
+            cpuUsage = metrics.cpuUsage;
+            memoryUsage = metrics.memoryUsage;
+        }
+    }
+
 
     // Class to represent an activity log entry
     private class ActivityLogEntry
@@ -86,4 +113,4 @@
             Timestamp = timestamp;
         }
     }
-}
+    }
