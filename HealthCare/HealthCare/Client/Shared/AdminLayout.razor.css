@@ -1,0 +1,17 @@
+﻿.home-link {
+    color: #333;
+    font-weight: bold;
+}
+
+.logout-button {
+    background-color: #d9534f;
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    margin-top: 16px;
+    cursor: pointer;
+}
+
+    .logout-button:hover {
+        background-color: #c9302c;
+    }
