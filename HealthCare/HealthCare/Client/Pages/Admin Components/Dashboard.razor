@@ -13,14 +13,14 @@
 
 @if (showMetrics)
 {
-    <h2>System Metrics</h2>
+    <h3>System Metrics</h3>
     <p>CPU usage: @cpuUsage</p>
-    <p>Memory usage: @memoryUsage</p>
+    
 }
 
 @if (showActivityLog)
 {
-    <h2>User Activity Log</h2>
+    <h3>User Activity Log</h3>
     <table>
         <thead>
             <tr>
@@ -87,14 +87,14 @@
 
         }
     }
-    async Task GetSystemMetrics ()
+    async Task GetSystemMetrics()
     {
         var response = await httpClient.GetAsync("api/systemmetrics");
         if (response.IsSuccessStatusCode)
         {
             var metrics = await response.Content.ReadFromJsonAsync<SystemMetrics>();
             cpuUsage = metrics.cpuUsage;
-            memoryUsage = metrics.memoryUsage;
+           
         }
     }
 
@@ -113,4 +113,4 @@
             Timestamp = timestamp;
         }
     }
-    }
+}
