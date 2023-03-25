@@ -30,14 +30,17 @@ namespace HealthCare.Shared.Interfaces
             m_process.Refresh();
             var endTime = DateTime.UtcNow;
             var cpuTime = (m_process.TotalProcessorTime.TotalMilliseconds / (endTime - startTime).TotalMilliseconds) * 100;
-            var memoryUsage = m_process.PrivateMemorySize64 / 1024.0; // Convert bytes to kilobytes
-            Math.Round(memoryUsage, 2);
+         
+            var driveInfo = new DriveInfo(Environment.GetFolderPath(Environment.SpecialFolder.System));
+            var totalSpace = driveInfo.TotalSize / 1024.0 ; // Convert bytes to megabytes
+            var freeSpace = driveInfo.AvailableFreeSpace / 1024.0 ; // Convert bytes to megabytes
+            var usedSpace = totalSpace - freeSpace;
             return new SystemMetrics
             {
                 cpuUsage = Math.Round(cpuTime, 2),
-                memoryUsage = Math.Round(memoryUsage, 2)
+                
             };
-        
         }
+
     }
 }
