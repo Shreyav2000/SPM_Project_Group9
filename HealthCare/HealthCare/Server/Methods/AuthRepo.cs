@@ -50,7 +50,7 @@ namespace HealthCare.Server.Methods
             {
                 return null;
             }
-
+            string Token = m_tokenService.GenerateToken(user);
             return m_tokenService.GenerateToken(user);
         }
 
