@@ -8,21 +8,38 @@ using HealthCare.Shared.Objects;
 
 namespace HealthCare.Shared.Interfaces
 {
+    /// <summary>
+    /// Represents a service for obtaining system metrics.
+    /// </summary>
     public interface ISystemMetricsService
     {
+        /// <summary>
+        /// Gets the current CPU usage as a percentage.
+        /// </summary>
+        /// <returns>The current CPU usage as a <see cref="Task{TResult}"/> of type <see cref="SystemMetrics"/>.</returns>
         Task<SystemMetrics> GetCpuUsageAsync();
         
     }
 
+    /// <summary>
+    /// Implements the <see cref="ISystemMetricsService"/> interface for obtaining system metrics.
+    /// </summary>
     public class SystemMetricsService : ISystemMetricsService
     {
         private readonly Process m_process;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SystemMetricsService"/> class.
+        /// </summary>
         public SystemMetricsService()
         {
             m_process = Process.GetCurrentProcess();
         }
 
+        /// <summary>
+        /// Gets the current CPU usage as a percentage.
+        /// </summary>
+        /// <returns>The current CPU usage as a <see cref="Task{TResult}"/> of type <see cref="SystemMetrics"/>.</returns>
         public async Task<SystemMetrics> GetCpuUsageAsync()
         {
             var startTime = DateTime.UtcNow - m_process.TotalProcessorTime;

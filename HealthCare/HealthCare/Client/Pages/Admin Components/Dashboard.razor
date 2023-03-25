@@ -6,6 +6,7 @@
 @inject HttpClient httpClient
 @using Newtonsoft.Json;
 @using HealthCare.Shared.Models;
+@using System.Xml.Linq;
 
 
 
@@ -15,7 +16,7 @@
 {
     <h3>System Metrics</h3>
     <p>CPU usage: @cpuUsage</p>
-    
+
 }
 
 @if (showActivityLog)
@@ -49,17 +50,12 @@
     private bool showMetrics = false;
     private bool showActivityLog = false;
     private double cpuUsage = 0.0;
-    private double memoryUsage = 0.0;
     private List<User> activityLog = new List<User>();
     private DateTime lastLogin;
 
-    //private async Task UpdateSystemMetricsAsync()
-    //{
-    //    cpuUsage = await SystemMetricsService.GetCpuUsageAsync();
-    //    memoryUsage = await SystemMetricsService.GetMemoryUsageAsync();
-    //}
-
-
+    /// <summary>
+    /// Toggles the display of system metrics.
+    /// </summary>
     private void ToggleMetrics()
     {
         showMetrics = !showMetrics;
@@ -77,7 +73,10 @@
         await GetSystemMetrics();
         StateHasChanged();
     }
-    // Get last login from the API
+    /// <summary>
+    /// Gets the last login from the API.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the list of last login entries.</returns>
     async Task GetLastLogins()
     {
         var response = await httpClient.GetAsync("api/user/lastlogin");
@@ -94,18 +93,25 @@
         {
             var metrics = await response.Content.ReadFromJsonAsync<SystemMetrics>();
             cpuUsage = metrics.cpuUsage;
-           
+
         }
     }
 
 
-    // Class to represent an activity log entry
+
     private class ActivityLogEntry
     {
         public string User { get; set; }
         public string Action { get; set; }
         public DateTime Timestamp { get; set; }
 
+        /**
+ * Constructor for the activity log entry.
+ * 
+ * @param user The user associated with the log entry.
+ * @param action The action associated with the log entry.
+ * @param timestamp The timestamp of the log entry.
+ */
         public ActivityLogEntry(string user, string action, DateTime timestamp)
         {
             User = user;
