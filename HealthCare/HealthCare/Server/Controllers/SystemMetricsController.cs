@@ -1,4 +1,5 @@
 ﻿using HealthCare.Shared.Interfaces;
+using HealthCare.Shared.Objects;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -13,18 +14,12 @@ public class SystemMetricsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("api/systemmetrics/cpuusage")]
-    public async Task<ActionResult<double>> GetCpuUsage()
+    [Route("api/systemmetrics")]
+    public async Task<ActionResult<SystemMetrics>> GetCpuUsage()
     {
         var cpuUsage = await _systemMetricsService.GetCpuUsageAsync();
         return Ok(cpuUsage);
     }
 
-    [HttpGet]
-    [Route("api/systemmetrics/memoryusage")]
-    public async Task<ActionResult<double>> GetMemoryUsage()
-    {
-        var memoryUsage = await _systemMetricsService.GetMemoryUsageAsync();
-        return Ok(memoryUsage);
-    }
+    
 }

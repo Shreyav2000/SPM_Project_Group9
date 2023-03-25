@@ -21,6 +21,9 @@ builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddBlazorTable();
-builder.Services.AddScoped<ISystemMetricsService, SystemMetricsService>();
+
+
+
+
 
 await builder.Build().RunAsync();
