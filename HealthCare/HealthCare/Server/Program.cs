@@ -27,6 +27,7 @@ builder.Services.AddScoped<IUserRoleService, UserRoleService> ();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<ISystemMetricsService, SystemMetricsService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
