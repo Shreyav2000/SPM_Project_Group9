@@ -3,32 +3,41 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using HealthCare.Shared.Models;
+using HealthCare.Shared.Objects;
 
 namespace HealthCare.Shared.Interfaces
 {
     public interface ISystemMetricsService
     {
-        public Task<double> GetCpuUsageAsync();
-        public Task<double> GetMemoryUsageAsync();
+        Task<SystemMetrics> GetCpuUsageAsync();
+        
     }
 
     public class SystemMetricsService : ISystemMetricsService
     {
-        public async Task<double> GetCpuUsageAsync()
+        private readonly Process m_process;
+
+        public SystemMetricsService()
         {
-            var process = Process.GetCurrentProcess();
-            var startTime = DateTime.UtcNow - process.TotalProcessorTime;
-            await Task.Delay(500); // Wait for half a second to get a more accurate reading
-            var endTime = DateTime.UtcNow;
-            var cpuTime = (process.TotalProcessorTime.TotalMilliseconds / (endTime - startTime).TotalMilliseconds) * 100;
-            return Math.Round(cpuTime, 2);
+            m_process = Process.GetCurrentProcess();
         }
 
-        public Task<double> GetMemoryUsageAsync()
+        public async Task<SystemMetrics> GetCpuUsageAsync()
         {
-            var process = Process.GetCurrentProcess();
-            var memoryUsage = process.PrivateMemorySize64 / 1024.0; // Convert bytes to megabytes
-            return Task.FromResult(Math.Round(memoryUsage, 2));
+            var startTime = DateTime.UtcNow - m_process.TotalProcessorTime;
+            await Task.Delay(500); // Wait for half a second to get a more accurate reading
+            m_process.Refresh();
+            var endTime = DateTime.UtcNow;
+            var cpuTime = (m_process.TotalProcessorTime.TotalMilliseconds / (endTime - startTime).TotalMilliseconds) * 100;
+            var memoryUsage = m_process.PrivateMemorySize64 / 1024.0; // Convert bytes to kilobytes
+            Math.Round(memoryUsage, 2);
+            return new SystemMetrics
+            {
+                cpuUsage = Math.Round(cpuTime, 2),
+                memoryUsage = Math.Round(memoryUsage, 2)
+            };
+        
         }
     }
 }
