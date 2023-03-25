@@ -1,0 +1,89 @@
+﻿@page "/admin/dashboard"
+@layout AdminLayout
+@using HealthCare.Shared.Objects;
+@using HealthCare.Shared.Interfaces
+@inject ISystemMetricsService SystemMetricsService
+@using System.Net.Http
+@inject HttpClient httpClient
+
+
+
+<h1>Admin Dashboard</h1>
+
+@if (showMetrics)
+{
+    <h2>System Metrics</h2>
+    <p>CPU usage: @cpuUsage</p>
+    <p>Memory usage: @memoryUsage</p>
+}
+
+@if (showActivityLog)
+{
+    <h2>User Activity Log</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Action</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in activityLog)
+            {
+                <tr>
+                    <td>@log.User</td>
+                    <td>@log.Action</td>
+                    <td>@log.Timestamp</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button @onclick="ToggleMetrics">Toggle Metrics</button>
+<button @onclick="ToggleActivityLog">Toggle Activity Log</button>
+
+@code {
+    private bool showMetrics = true;
+    private bool showActivityLog = true;
+    private double cpuUsage = 0.0;
+    private double memoryUsage = 0.0;
+    private List<ActivityLogEntry> activityLog = new List<ActivityLogEntry>();
+
+    private void ToggleMetrics()
+    {
+        showMetrics = !showMetrics;
+    }
+
+    private void ToggleActivityLog()
+    {
+        showActivityLog = !showActivityLog;
+    }
+
+    // Simulate getting system metrics and activity log entries
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Task.Delay(1000);
+        activityLog.Add(new ActivityLogEntry("user1", "logged in", DateTime.Now));
+
+        await Task.Delay(1000);
+        activityLog.Add(new ActivityLogEntry("user2", "viewed dashboard", DateTime.Now));
+    }
+
+    // Class to represent an activity log entry
+    private class ActivityLogEntry
+    {
+        public string User { get; set; }
+        public string Action { get; set; }
+        public DateTime Timestamp { get; set; }
+
+        public ActivityLogEntry(string user, string action, DateTime timestamp)
+        {
+            User = user;
+            Action = action;
+            Timestamp = timestamp;
+        }
+    }
+}
