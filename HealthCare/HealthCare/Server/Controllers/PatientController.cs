@@ -73,5 +73,21 @@ namespace HealthCare.Server.Controllers
             return Ok(history);
         }
 
+        /// <summary>
+        /// Endpoint to get patient consultations
+        /// </summary>
+        /// <param name="a_drug"></param>
+        [Authorize]
+        [HttpGet, Route("records/patientConsults")]
+
+        public ActionResult<List<UserConsults>> GetUserConsultations()
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 1);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+            var history = m_service.GetUserConsultations();
+            return Ok(history);
+        }
     }
 }

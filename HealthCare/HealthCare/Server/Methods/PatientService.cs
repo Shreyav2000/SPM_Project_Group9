@@ -2,6 +2,8 @@
 using HealthCare.Shared.Models;
 using HealthCare.Shared.Objects;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 
 namespace HealthCare.Server.Methods
 {
@@ -15,6 +17,41 @@ namespace HealthCare.Server.Methods
             m_context = context;
             m_logger = logger;
         }
+
+        /// <summary>
+        /// Get user names and doctor names who they have consulted
+        /// </summary>
+        /// <param name="a_start"></param>
+        /// <param name="a_end"></param>
+        /// <returns>list of users with doctors from consultations</returns>
+        public async Task<List<UserConsults>> GetUserConsultations()
+        {
+            //return await(from pa in m_context.Patientattendances
+            //             join p in m_context.Patients on pa.PatientId equals p.PatientId
+            //             join s in m_context.Staff on pa.SeenByDoctorId equals s.Staffid
+            //             select new UserConsults
+            //             {
+            //                 PatientId = p.PatientId,
+            //                 PatientName = p.Fname + " " + p.Lname,
+            //                 DoctorName = s.Fname + " " + s.Lname
+            //             }).ToListAsync();
+           return await m_context.Patientattendances
+                    .Join(m_context.Patients,
+                        pa => pa.PatientId,
+                        p => p.PatientId,
+                        (pa, p) => new { pa, p })
+                    .Join(m_context.Staff,
+                        pa_p => pa_p.pa.SeenByDoctorId,
+                        s => s.Staffid,
+                        (pa_p, s) => new UserConsults
+                        {
+                            PatientId = pa_p.p.PatientId,
+                            PatientName = pa_p.p.Fname + " " + pa_p.p.Lname,
+                            DoctorName = s.Fname + " " + s.Lname
+                        })
+                    .ToListAsync();
+        }
+
         /// <summary>
         /// Gets attendance for patient during a specified period
         /// </summary>
@@ -85,19 +122,19 @@ namespace HealthCare.Server.Methods
         public async Task<List<MedHistory>> GetPatientRecord(int a_patientId)
         {
             return await (
-    from pa in m_context.Patientattendances
-    join s in m_context.Staff on pa.SeenByDoctorId equals s.Staffid
-    join c in m_context.Patientcomplaintnotes on pa.ConsultId equals c.ConsultId
-    join ps in m_context.Prescriptiondetails on pa.ConsultId equals ps.ConsId into prescriptions
-    where pa.PatientId == pa.PatientId
-    select new MedHistory
-    {
-        ConsultId = pa.ConsultId,
-        Complaint = c.Notes,
-        Timestamp = pa.PTime,
-        DoctorName = s.Fname + " " + s.Lname
-    }).ToListAsync();
-        }
+                from pa in m_context.Patientattendances
+                join s in m_context.Staff on pa.SeenByDoctorId equals s.Staffid
+                join c in m_context.Patientcomplaintnotes on pa.ConsultId equals c.ConsultId
+                join ps in m_context.Prescriptiondetails on pa.ConsultId equals ps.ConsId into prescriptions
+                where pa.PatientId == pa.PatientId
+                select new MedHistory
+                {
+                    ConsultId = pa.ConsultId,
+                    Complaint = c.Notes,
+                    Timestamp = pa.PTime,
+                    DoctorName = s.Fname + " " + s.Lname
+                }).ToListAsync();
+             }
 
-    }
+        }
 }

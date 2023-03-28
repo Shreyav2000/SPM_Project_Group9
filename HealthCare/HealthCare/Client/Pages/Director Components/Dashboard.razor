@@ -1,0 +1,38 @@
+﻿@page "/director/dashboard"
+@using System.Text.RegularExpressions
+@using HealthCare.Shared.Objects;
+@using Radzen.Blazor.Rendering
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject HttpClient Http
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@inject DialogService dialogService
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" Class="rz-pt-8">
+    Welcome
+    <ul>
+        @foreach (var item in UserConsultations)
+        {
+                        <li>@item.PatientName</li>
+        }
+            </ul>
+</RadzenText>
+
+@*<RadzenStack Gap="1rem" Style="position: relative">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H6">Patient consultations </RadzenText>
+            <RadzenDataGrid Data=@userConsultations Style="height: 500px" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowSorting="true">
+                <Columns>
+                    <RadzenDataGridColumn TItem="UserConsults" Title="Patient" Width="200px" Property="UserConsults.PatientName">
+                        <Template Context="patient">
+                            <b>@patient.PatientName</b>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>*@
+
+            
