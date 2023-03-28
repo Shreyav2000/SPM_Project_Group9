@@ -83,6 +83,9 @@ namespace HealthCare.Client.Pages
                             case 3://Nurse
                                 //Todo implement Navigation to Nurse Dashboard
                                 break;
+                            case 6:
+                                NavigationManager.NavigateTo("/director/dashboard");
+                                break;
                         }
                     }
 
