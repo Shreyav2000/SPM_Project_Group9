@@ -2,6 +2,9 @@
     color: #333;
     font-weight: bold;
 }
+ .home-link:hover {
+        color: #666; /* to change color on hover */
+ }
 
 .logout-button {
     background-color: #d9534f;
