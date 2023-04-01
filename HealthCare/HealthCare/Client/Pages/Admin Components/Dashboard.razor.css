@@ -60,13 +60,78 @@ button {
     }
 
 /* Hide the system metrics and user activity log by default */
-.metrics, .activity-log {
+.metrics,
+.activity-log {
     display: none;
 }
 
 /* Show the system metrics and user activity log when the corresponding button is clicked */
-.show-metrics .metrics, .show-activity-log .activity-log {
+.show-metrics .metrics,
+.show-activity-log .activity-log {
     display: block;
 }
 
+/* Style for the form */
+form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
 
+label {
+    margin-bottom: 10px;
+}
+
+input[type="text"],
+select {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    input[type="submit"]:hover {
+        background-color: #3e8e41;
+    }
+
+/* Style for the delete user role button */
+.delete-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    .delete-btn:hover {
+        background-color: #d32f2f;
+    }
+
+/* Style for the user roles table */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
