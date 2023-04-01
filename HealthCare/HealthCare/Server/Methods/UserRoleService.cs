@@ -1,5 +1,6 @@
 ﻿using HealthCare.Shared.Interfaces;
 using HealthCare.Shared.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -31,7 +32,6 @@ namespace HealthCare.Server.Methods
             m_logger = logger;
         }
 
-
         /// <summary>
         /// Adds a new user role to the database.
         /// </summary>
@@ -43,9 +43,9 @@ namespace HealthCare.Server.Methods
             try
             {
                 m_context.UserRoles.AddAsync(userRole);
-               int i = await m_context.SaveChangesAsync();
+                int i = await m_context.SaveChangesAsync();
                 if (i > 0)
-                return true;
+                    return true;
             }
             catch (Exception ex)
             {
@@ -76,17 +76,33 @@ namespace HealthCare.Server.Methods
 
                 m_context.UserRoles.Remove(userRole);
                 int i = await m_context.SaveChangesAsync();
-                if (i>0)
-                return true;
+                if (i > 0)
+                    return true;
             }
             catch (Exception ex)
             {
                 m_logger.LogError(ex, $"Failed to delete user role with Id {roleId}.");
-                
+
             }
 
             return false;
         }
 
+        /// <summary>
+        /// Gets a list of all user roles in the system.
+        /// </summary>
+        /// <returns>A list of user roles.</returns>
+        public async Task<List<UserRole>> GetAllUserRoles()
+        {
+            try
+            {
+                return await m_context.UserRoles.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                m_logger.LogError(ex, "Failed to get user roles from the database.");
+                return null;
+            }
+        }
     }
 }
