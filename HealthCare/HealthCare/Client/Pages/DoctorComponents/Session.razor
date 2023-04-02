@@ -1,0 +1,97 @@
+﻿@page "/doctor/session"
+@using System.Text.RegularExpressions
+@using HealthCare.Shared.Models;
+@using Radzen.Blazor.Rendering
+@layout DoctorLayout
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject HttpClient Http
+@using Faso.Blazor.SpinKit
+@inject SpinnerService SpinnerService
+@inject DialogService dialogService
+
+<style>
+    .container {
+        display: grid;
+        align-items: center;
+        grid-template-columns: 0fr 2fr 3fr 1fr;
+        column-gap: 5px;
+    }
+</style>
+@if (m_previousSession.Id != null)
+{
+    <RadzenCard Style="width:100%;">
+        <RadzenRow>
+            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H6" Class="rz-pt-8">
+                Previous Session
+            </RadzenText>
+        </RadzenRow>
+        <div class="row">
+            <div class="container">
+                <div class="image">
+                    <RadzenCard>
+                        <img src="logo.png" style="width:60px;" />
+                    </RadzenCard>
+                </div>
+                <div class="text">
+                    <RadzenLabel Text="@m_previousSession.Patient.PatientNo" /> <br />
+                    <RadzenLabel Text="@m_previousSession.Patient.Fname" /><br />
+                    <RadzenLabel Text="@m_previousSession.Prescriptions.First().Ddate.Value.ToLongDateString()" />
+                </div>
+                <RadzenTextArea Disabled="true" Value="@m_previousSession.ComplaintNotes" Cols="40" Rows="5" Style="margin-bottom: 20px;margin-top:20px;" />
+                <RadzenButton Text="Review" Style="background-color:green;" />
+            </div>
+        </div>
+
+    </RadzenCard>
+}
+<RadzenStack Gap="1rem" Style="position: relative">
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+                <RadzenText TextStyle="TextStyle.H6">Patient </RadzenText>
+                <input type="text" placeholder="Enter patient Id" @bind-value="@m_patient" @oninput="OnValueChange" />
+            </div>
+            <RadzenDataGrid Data=@Patients Style="height: 500px" AllowFiltering="false" AllowSorting="false">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Patient" Property="Date" Title="Patient ID" Width="120px">
+                        <Template Context="patient">
+                            <b>@patient.PatientNo</b>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Patient" Title="Patient" Width="200px" Property="Patient.PatientName">
+                        <Template Context="patient">
+                            <b>@patient.Fname @patient.Lname</b>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="Patient" Property="Patient.Dob" Title="Date Of Birth">
+                        <Template Context="patient">
+                            @if (patient.Dob.HasValue)
+                                @patient.Dob.Value.ToString("dd MMM, yyyy")
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Patient" Property="Patient.Dob" Title="Gender">
+                            <Template Context="patient">
+                                @patient.Sex
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Patient" Property="Patient.Id" Title="Action">
+                            <Template Context="patient">
+                                <RadzenButton Text="Start" Style="background-color:green;" Click="(() => openDialog(patient))" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+    @if (IsVisible)
+{
+    <div id="loading-div-background">
+        <div id="loading-div" class="ui-corner-all">
+            <div class="spinnermain-container">
+                <SpinKitCircle />
+            </div>
+            <h2 style="color:#003445;font-weight:normal;">Please wait....</h2>
+        </div>
+    </div>
+}

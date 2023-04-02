@@ -1,4 +1,6 @@
-﻿using HealthCare.Shared.Interfaces;
+﻿using HealthCare.Server.Methods;
+using HealthCare.Shared.Interfaces;
+using HealthCare.Shared.Models;
 using HealthCare.Shared.Objects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,11 +16,17 @@ namespace HealthCare.Server.Controllers
 
         private readonly Methods.Validator m_validator;
         private readonly IStaffService m_service;
+        private readonly IDoctorService m_doctorService;
+        private readonly ITokenService m_tokenService;
+        private readonly IComplaintService m_complaintService;
 
-        public StaffController(IStaffService a_staffService, ITokenService a_tokenService, IPermissionService a_permission)
+        public StaffController(IStaffService a_staffService, ITokenService a_tokenService, IPermissionService a_permission, IDoctorService doctorService, ITokenService tokenService, IComplaintService a_complaintService)
         {
             m_service = a_staffService;
             m_validator = new Methods.Validator(a_tokenService, a_permission);
+            m_doctorService = doctorService;
+            m_tokenService = tokenService;
+            m_complaintService = a_complaintService;
         }
         /// <summary>
         /// Endpoint to look up a staff profile using their id
@@ -35,6 +43,41 @@ namespace HealthCare.Server.Controllers
 
             var history = m_service.GetStaff(a_id);
             return Ok(history);
+        }
+        /// <summary>
+        /// Endpoint save consulting session between a doctor and a patient
+        /// </summary>
+        /// <param name="a_drug"></param>
+        [Authorize]
+        [HttpGet, Route("complaints")]
+        public async Task<ActionResult<List<Complaint>>> GetComplaints()
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 34);
+            int? doctor = m_tokenService.GetUserIdFromToken(token);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            return await m_complaintService.GetComplaint();
+        }
+        /// <summary>
+        /// Endpoint save consulting session between a doctor and a patient
+        /// </summary>
+        /// <param name="a_drug"></param>
+        [Authorize]
+        [HttpPost, Route("records/session")]
+        public async Task<ActionResult> SaveRecord(SessionObject a_session)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 2);
+            int? doctor = m_tokenService.GetUserIdFromToken(token);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            if (await m_doctorService.SubmitSession(a_session, (int)doctor))
+                return Ok("Success");
+
+            return BadRequest("Error occurred");
         }
     }
 }

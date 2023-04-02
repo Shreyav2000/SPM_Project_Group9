@@ -53,7 +53,7 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
             <RadzenCard Style="position: relative;height: 280px">
-                <RadzenText TextStyle="TextStyle.H6">Total Cases</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6">Total Cases/Complaints</RadzenText>
                 <RadzenText TextStyle="TextStyle.H2" Style="position: absolute; right: 1.5rem; top: 1rem;">@TotalCases.Sum(t => t.Count)</RadzenText>
                 <RadzenChart Style="width: 100%; height: 120px; margin-bottom: -30px;">
                     <RadzenColumnSeries Data=@TotalCases ValueProperty="Count" CategoryProperty="Day" Title="Cases" Fill="var(--rz-success)" />

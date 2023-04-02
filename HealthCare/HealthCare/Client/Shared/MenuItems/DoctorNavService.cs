@@ -14,13 +14,13 @@
         {
             Name = "Dashboard",
             Updated = true,
-            Path = "/dashboard",
+            Path = "/doctor/dashboard",
             Icon = "&#xe871"
         },
         new NavItems
         {
             Name = "Session",
-            Path = "/session",
+            Path = "/doctor/session",
             Icon = "&#xe037"
         },
         new NavItems

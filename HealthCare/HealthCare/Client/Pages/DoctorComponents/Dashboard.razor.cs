@@ -30,7 +30,7 @@ namespace HealthCare.Client.Pages.DoctorComponents
             TopPrescribedDrugs = new();
             TotalCases = new();
             m_fetchingData = false;
-            m_period = new DateTime(2018,03,01);
+            m_period = DateTime.Now;
 
             if (Http.DefaultRequestHeaders == null)
             {
