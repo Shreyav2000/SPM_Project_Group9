@@ -2,7 +2,6 @@
 @layout AdminLayout
 @using HealthCare.Shared.Objects;
 @using HealthCare.Shared.Interfaces
-@using System.Net.Http
 @inject HttpClient httpClient
 @using Newtonsoft.Json;
 @using HealthCare.Shared.Models;
@@ -44,7 +43,7 @@
     </table>
 }
 
-@if (showUserRoles)
+@if (!showUserRoles)
 {
     <h3>User Roles</h3>
     <table class="user-roles-table">
@@ -69,7 +68,7 @@
         </tbody>
     </table>
 
-    @*<button @onclick="() => showAddUserRoleDialog = true">Add User Role</button>
+    <button @onclick="() => showAddUserRoleDialog = true">Add User Role</button>
 
     @if (showAddUserRoleDialog)
     {
@@ -84,7 +83,7 @@
                     <label for="roleName">Role Name:</label>
                     <input type="text" class="form-control" id="roleName" @bind-value="userRole.RoleName" />
                 </div>
-                <button type="submit" class="btn btn-primary" @onclick="AddUserRole">Add Role</button>
+                <button type="button" class="btn btn-primary" @onclick="AddUserRole">Add Role</button>
                 <button type="button" class="btn btn-secondary" @onclick="() => showAddUserRoleDialog = false">Cancel</button>
             </form>
         </div>
@@ -96,7 +95,7 @@
         <div class="alert alert-danger" role="alert">
             @errorMessage
         </div>
-    }*@
+    }
 
 
 
@@ -113,16 +112,16 @@
 @code {
     private bool showMetrics = false;
     private bool showActivityLog = false;
-    private bool showUserRoles = false;
+    private bool showUserRoles = true;
     private double cpuUsage = 0.0;
     private List<User> activityLog = new List<User>();
     private List<UserRole> userRoles = new List<UserRole>();
     private DateTime lastLogin;
     private int roleId;
     private UserRole userRole = new UserRole();
-    //private bool showAddUserRoleDialog = false;
-    //private string errorMessage = "";
-    //private bool isError = false;
+    private bool showAddUserRoleDialog = false;
+    private string errorMessage = "";
+    private bool isError = false;
 
     /// <summary>
     /// Toggles the display of system metrics.
@@ -145,9 +144,9 @@
     {
         await GetLastLogins();
         await GetSystemMetrics();
-        //await AddUserRole();
-        await ToggleUserRoles();
-        await DeleteUserRole(roleId);
+        //await ToggleUserRoles();
+
+
 
         StateHasChanged();
     }
@@ -178,28 +177,15 @@
     /// Toggles the display of user roles.
     /// </summary>
 
-    private async Task ToggleUserRoles()
+    async Task ToggleUserRoles()
     {
-        // If user roles are currently being shown, hide them
-        if (showUserRoles)
-        {
-            showUserRoles = false;
-            userRoles.Clear(); // Clear the list of user roles
-            return;
-        }
 
         // Otherwise, retrieve user roles from the API and show them
         try
         {
-            var response = await httpClient.GetAsync("api/UserRole/getall");
-            response.EnsureSuccessStatusCode();
+            showUserRoles = !showUserRoles;
+            userRoles = await httpClient.GetFromJsonAsync<List<UserRole>>("api/UserRole/getall");
 
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var userRolesList = JsonConvert.DeserializeObject<List<UserRole>>(responseContent);
-
-            userRoles.Clear();
-            userRoles.AddRange(userRolesList);
-            showUserRoles = true;
         }
         catch (HttpRequestException ex)
         {
@@ -208,34 +194,27 @@
     }
 
 
-    /// <summary>
-    /// Adds a user role to the database.
-    /// </summary>
-    //private async Task AddUserRole()
-    //{
-    //    try
-    //    {
-    //        var json = JsonConvert.SerializeObject(userRole);
-    //        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-    //        var response = await httpClient.PostAsync("api/UserRole/add", content);
-
-    //        if (!response.IsSuccessStatusCode)
-    //        {
-    //            throw new Exception($"Failed to add user role: {response.ReasonPhrase}");
-    //        }
-
-    //        showAddUserRoleDialog = false;
-    //        userRoles.Add(userRole);
-    //        userRole = new UserRole();
-    //        isError = false;
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        errorMessage = ex.Message;
-    //        isError = true;
-    //    }
-    //}
+    ///// <summary>
+    ///// Adds a user role to the database.
+    ///// </summary>
+    ///// <summary>
+    ///// Adds a user role to the database.
+    ///// </summary>
+    private async Task AddUserRole()
+    {
+        try
+        {
+            var response = await httpClient.PostAsJsonAsync("api/UserRole/add", userRole);
+            response.EnsureSuccessStatusCode();
+            userRole = new UserRole();
+            await ToggleUserRoles();
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            errorMessage = ex.Message;
+        }
+    }
 
 
 
