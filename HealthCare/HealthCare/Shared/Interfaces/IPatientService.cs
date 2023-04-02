@@ -14,7 +14,7 @@ namespace HealthCare.Shared.Interfaces
         Task<List<AttendanceObject>> GetAttendance(DateTime a_start, DateTime a_end,int? a_doctorId);
         Task<List<MedHistory>> GetPatientRecord(int a_patientId);
         Patient GetPatientProfile(string a_patientId);
-
+        Task<List<Patient>> GetPatients(string a_patientId);
         Task<List<UserConsults>> GetUserConsultations();
     }
 }

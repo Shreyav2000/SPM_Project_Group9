@@ -135,6 +135,18 @@ namespace HealthCare.Server.Methods
                     DoctorName = s.Fname + " " + s.Lname
                 }).ToListAsync();
              }
-
+        /// <summary>
+        /// Gets a list of patients by the specified id
+        /// </summary>
+        /// <param name="a_patientId"></param>
+        /// <returns></returns>
+        public Task<List<Patient>> GetPatients(string a_patientId)
+        {
+            if (string.IsNullOrEmpty(a_patientId))
+            {
+                return m_context.Patients.Take(100).ToListAsync();
+            }
+            return m_context.Patients.Where(i => i.PatientNo.StartsWith(a_patientId) || i.PatientId.ToString().StartsWith(a_patientId)).Take(100).ToListAsync();
         }
-}
+    }
+    }

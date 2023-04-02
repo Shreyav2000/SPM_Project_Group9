@@ -1,5 +1,6 @@
 ﻿using HealthCare.Server.Methods;
 using HealthCare.Shared.Interfaces;
+using HealthCare.Shared.Models;
 using HealthCare.Shared.Objects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -59,7 +60,7 @@ namespace HealthCare.Server.Controllers
         /// <summary>
         /// Endpoint to look up a patient using their id
         /// </summary>
-        /// <param name="a_drug"></param>
+        /// <param name="a_id"></param>
         [Authorize]
         [HttpGet, Route("records/profile/{a_id}")]
         public ActionResult<List<MedHistory>> GetPatient(string a_id)
@@ -69,8 +70,8 @@ namespace HealthCare.Server.Controllers
             if (!string.IsNullOrEmpty(validationResult))
                 return BadRequest(validationResult);
 
-            var history = m_service.GetPatientProfile(a_id);
-            return Ok(history);
+            var patient = m_service.GetPatientProfile(a_id);
+            return Ok(patient);
         }
 
         /// <summary>
@@ -88,6 +89,23 @@ namespace HealthCare.Server.Controllers
                 return BadRequest(validationResult);
             var history = m_service.GetUserConsultations();
             return Ok(history);
+        }
+
+        /// <summary>
+        /// Endpoint to look up a patient using their id
+        /// </summary>
+        /// <param name="a_id"></param>
+        [Authorize]
+        [HttpGet, Route("records/profile/list/{a_id}")]
+        public async Task<ActionResult<List<Patient>>> GetPatients(string a_id)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 1);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            var patients = await m_service.GetPatients(a_id);
+            return Ok(patients);
         }
     }
 }
