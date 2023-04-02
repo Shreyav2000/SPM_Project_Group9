@@ -9,8 +9,37 @@
 @inject SpinnerService SpinnerService
 @inject DialogService dialogService
 
-<RadzenCard >
-    
+<style>
+    .container {
+        display: grid;
+        align-items: center;
+        grid-template-columns: 0fr 2fr 3fr 1fr;
+        column-gap: 5px;
+    }
+</style>
+<RadzenCard Style="width:100%;">
+    <RadzenRow>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H6" Class="rz-pt-8">
+            Previous Session
+        </RadzenText>
+    </RadzenRow>
+    <div class="row">
+        <div class="container">
+            <div class="image">
+                <RadzenCard>
+                    <img src="logo.png" style="width:60px;" />
+                </RadzenCard>
+            </div>
+            <div class="text">
+                <RadzenLabel Text="Patient ID" /> <br />
+                <RadzenLabel Text="Patient Name" /><br />
+                <RadzenLabel Text="Timestamp" />
+            </div>
+                <RadzenTextArea Disabled="true" Value="asdasdasdasdasdasdasdasdasdas" Cols="40" Rows="5" Style="margin-bottom: 20px;margin-top:20px;" />
+            <RadzenButton Text="Review" Style="background-color:green;" />
+        </div>
+    </div>
+
 </RadzenCard>
 <RadzenStack Gap="1rem" Style="position: relative">
     <RadzenRow>
@@ -33,28 +62,26 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Patient" Property="Patient.Dob" Title="Date Of Birth">
                         <Template Context="patient">
-                            @if(patient.Dob.HasValue)
-                          @patient.Dob.Value.ToString("dd MMM, yyyy")
-                        </Template>
-                    </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Patient" Property="Patient.Dob" Title="Gender">
-                            <Template Context="patient">
-                               
-                                @patient.Sex
-
+                            @if (patient.Dob.HasValue)
+                                @patient.Dob.Value.ToString("dd MMM, yyyy")
                             </Template>
                         </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Patient" Property="Patient.Id" Title="Action">
-                        <Template Context="patient">
-                            <RadzenButton Text="Start" Style="background-color:green;" Click="(() => openDialog(patient))" />
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenColumn>
-    </RadzenRow>
-</RadzenStack>
-@if (IsVisible)
+                        <RadzenDataGridColumn TItem="Patient" Property="Patient.Dob" Title="Gender">
+                            <Template Context="patient">
+                                @patient.Sex
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="Patient" Property="Patient.Id" Title="Action">
+                            <Template Context="patient">
+                                <RadzenButton Text="Start" Style="background-color:green;" Click="(() => openDialog(patient))" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+    @if (IsVisible)
 {
     <div id="loading-div-background">
         <div id="loading-div" class="ui-corner-all">

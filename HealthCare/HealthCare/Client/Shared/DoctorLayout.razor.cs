@@ -20,5 +20,11 @@ namespace HealthCare.Client.Shared
                 Http.DefaultRequestHeaders.Authorization = authHeader;
             }
         }
+
+        private async Task Logout()
+        {
+            await sessionStorage.ClearAsync();
+            UriHelper.NavigateTo("/");
+        }
     }
 }

@@ -141,7 +141,7 @@ namespace HealthCare.Server.Methods
         /// </summary>
         public List<Drug> GetDrugs()
         {
-            return m_context.Drugs.ToList();
+            return m_context.Drugs.Where(t => !t.OutOfService).ToList();
         }
         /// <summary>
         /// Gets analysis of drugs usuages in the system

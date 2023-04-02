@@ -1005,13 +1005,10 @@ public partial class HealthcareContext : DbContext
                 .HasColumnName("ConsID");
             entity.Property(e => e.Ddate).HasColumnType("datetime");
             entity.Property(e => e.DispTotal).HasPrecision(18, 2);
-            entity.Property(e => e.Dosage).HasPrecision(18, 2);
-            entity.Property(e => e.DosageUnit).HasMaxLength(20);
             entity.Property(e => e.DrugId)
                 .HasColumnName("DrugID");
             entity.Property(e => e.EditedBy).HasColumnType("int(11)");
             entity.Property(e => e.EditedDate).HasColumnType("datetime");
-            entity.Property(e => e.FormulationDesc).HasColumnType("int(11)");
             entity.Property(e => e.Frequency).HasMaxLength(50);
             entity.Property(e => e.FrequencyQty).HasColumnType("int(11)");
             entity.Property(e => e.NoofDays).HasColumnType("int(11)");
@@ -1019,19 +1016,7 @@ public partial class HealthcareContext : DbContext
             entity.Property(e => e.PrescriptionSessionId)
                 .HasMaxLength(50)
                 .HasColumnName("PrescriptionSessionID");
-            entity.Property(e => e.ProviderId)
-                .HasColumnType("int(11)")
-                .HasColumnName("ProviderID");
-            entity.Property(e => e.Route).HasMaxLength(50);
-            entity.Property(e => e.ServiceNumber).HasMaxLength(50);
-            entity.Property(e => e.ServiceOptionId)
-                .HasMaxLength(10)
-                .HasColumnName("ServiceOptionID");
             entity.Property(e => e.Total).HasPrecision(18, 2);
-            entity.Property(e => e.UserId)
-                .HasColumnType("int(11)")
-                .HasColumnName("UserID");
-            entity.Property(e => e.Valid).HasColumnType("int(11)");
         });
 
         modelBuilder.Entity<Remark>(entity =>

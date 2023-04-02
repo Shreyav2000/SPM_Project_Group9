@@ -15,19 +15,22 @@ namespace HealthCare.Client.Pages.DoctorComponents
     {
         protected bool IsVisible { get; set; }
         private List<Patient> Patients { get; set; }
+        private List<Drug> Drugs { get; set; }
         private string m_patient { get; set; }
         private Timer timerObj;
         protected override async Task OnInitializedAsync()
         {
             Patients = new List<Patient>();
+            Drugs = new List<Drug>();
             if (Http.DefaultRequestHeaders == null)
             {
                 string token = await sessionStorage.GetItemAsync<string>("token");
                 var authHeader = new AuthenticationHeaderValue("Bearer", token);
                 Http.DefaultRequestHeaders.Authorization = authHeader;
             }
-
+            await GetDrugs();
             await getData();
+
             timerObj = new Timer(1500);
             timerObj.Elapsed += OnUserFinish;
             timerObj.AutoReset = false;
@@ -44,6 +47,21 @@ namespace HealthCare.Client.Pages.DoctorComponents
         private async void OnUserFinish(Object source, ElapsedEventArgs e)
         {
             await getData();
+        }
+        async Task GetDrugs()
+        {
+            ShowSpinner();
+            try
+            {
+                Drugs = await Http.GetFromJsonAsync<List<Drug>>("api/drug/list");
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            HideSpinner();
         }
         /// <summary>
         /// Gets analytical data from the api
@@ -63,7 +81,7 @@ namespace HealthCare.Client.Pages.DoctorComponents
                 {
                     Patients = await Http.GetFromJsonAsync<List<Patient>>("api/patient/records/profile/list/100");
                 }
-              
+
                 StateHasChanged();
             }
             catch (Exception ex)
@@ -95,9 +113,10 @@ namespace HealthCare.Client.Pages.DoctorComponents
         void openDialog(Patient a_object)
         {
             dialogService.Open<SessionDialog>($"{a_object.Fname} {a_object.Lname}'s Session",
-                            new Dictionary<string, object>() { { "record", a_object
-        }
-                                      },
+                            new Dictionary<string, object>() { 
+                                { "record", a_object },
+                                { "drugs", Drugs}
+                                },
                             new DialogOptions() { Width = "1000px", Height = "800px", ShowClose = true });
         }
     }

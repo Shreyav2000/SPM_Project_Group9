@@ -6,7 +6,7 @@ namespace HealthCare.Shared.Models;
 
 public partial class Drug
 {
-    public string DrugId { get; private set; } = string.Empty;
+    public string DrugId { get; set; } = string.Empty;
 
     public string? Drugname { get; set; }
     public decimal? Price { get; set; }
