@@ -2,12 +2,13 @@
 @layout AdminLayout
 @using HealthCare.Shared.Objects;
 @using HealthCare.Shared.Interfaces
-@using System.Net.Http
 @inject HttpClient httpClient
 @using Newtonsoft.Json;
 @using HealthCare.Shared.Models;
 @using System.Xml.Linq;
-
+@using System.Text;
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
 
 
 <h1>Admin Dashboard</h1>
@@ -16,7 +17,6 @@
 {
     <h3>System Metrics</h3>
     <p>CPU usage: @cpuUsage</p>
-
 }
 
 @if (showActivityLog)
@@ -43,15 +43,85 @@
     </table>
 }
 
+@if (!showUserRoles)
+{
+    <h3>User Roles</h3>
+    <table class="user-roles-table">
+        <thead>
+            <tr>
+                <th>Role Id</th>
+                <th>Role Name</th>
+                <th>Delete Button</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var userRole in userRoles)
+            {
+                <tr>
+                    <td>@userRole.RoleId</td>
+                    <td>@userRole.RoleName</td>
+                    <td>
+                        <button class="delete-btn" @onclick="() => DeleteUserRole(userRole.RoleId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button @onclick="() => showAddUserRoleDialog = true">Add User Role</button>
+
+    @if (showAddUserRoleDialog)
+    {
+        <div class="add-user-role-dialog">
+            <h3>Add User Role</h3>
+            <form>
+                <div class="form-group">
+                    <label for="roleId">Role ID:</label>
+                    <input type="text" class="form-control" id="roleId" @bind-value="userRole.RoleId" />
+                </div>
+                <div class="form-group">
+                    <label for="roleName">Role Name:</label>
+                    <input type="text" class="form-control" id="roleName" @bind-value="userRole.RoleName" />
+                </div>
+                <button type="button" class="btn btn-primary" @onclick="AddUserRole">Add Role</button>
+                <button type="button" class="btn btn-secondary" @onclick="() => showAddUserRoleDialog = false">Cancel</button>
+            </form>
+        </div>
+    }
+
+
+    @if (isError)
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+
+
+
+
+
+
+
+}
+
 <button @onclick="ToggleMetrics">Toggle Metrics</button>
 <button @onclick="ToggleActivityLog">Toggle Activity Log</button>
+<button @onclick="ToggleUserRoles">Toggle User Roles</button>
 
 @code {
     private bool showMetrics = false;
     private bool showActivityLog = false;
+    private bool showUserRoles = true;
     private double cpuUsage = 0.0;
     private List<User> activityLog = new List<User>();
+    private List<UserRole> userRoles = new List<UserRole>();
     private DateTime lastLogin;
+    private int roleId;
+    private UserRole userRole = new UserRole();
+    private bool showAddUserRoleDialog = false;
+    private string errorMessage = "";
+    private bool isError = false;
 
     /// <summary>
     /// Toggles the display of system metrics.
@@ -61,6 +131,9 @@
         showMetrics = !showMetrics;
     }
 
+    /// <summary>
+    /// Toggles the display of the user activity log.
+    /// </summary>
     private void ToggleActivityLog()
     {
         showActivityLog = !showActivityLog;
@@ -71,6 +144,10 @@
     {
         await GetLastLogins();
         await GetSystemMetrics();
+        //await ToggleUserRoles();
+
+
+
         StateHasChanged();
     }
     /// <summary>
@@ -96,8 +173,71 @@
 
         }
     }
+    /// <summary>
+    /// Toggles the display of user roles.
+    /// </summary>
+
+    async Task ToggleUserRoles()
+    {
+
+        // Otherwise, retrieve user roles from the API and show them
+        try
+        {
+            showUserRoles = !showUserRoles;
+            userRoles = await httpClient.GetFromJsonAsync<List<UserRole>>("api/UserRole/getall");
+
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine("Error retrieving user roles: " + ex.Message);
+        }
+    }
 
 
+    ///// <summary>
+    ///// Adds a user role to the database.
+    ///// </summary>
+    ///// <summary>
+    ///// Adds a user role to the database.
+    ///// </summary>
+    private async Task AddUserRole()
+    {
+        try
+        {
+            var response = await httpClient.PostAsJsonAsync("api/UserRole/add", userRole);
+            response.EnsureSuccessStatusCode();
+            userRole = new UserRole();
+            await ToggleUserRoles();
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            errorMessage = ex.Message;
+        }
+    }
+
+
+
+
+    /// <summary>
+    /// deletes a user role from the database.
+    /// </summary>
+
+    private async Task DeleteUserRole(int roleId)
+    {
+        var response = await httpClient.PostAsync($"api/UserRole/delete?roleId={roleId}", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(result);
+            userRoles.RemoveAll(ur => ur.RoleId == roleId);
+        }
+        else
+        {
+            Console.WriteLine("Failed to delete user role");
+        }
+    }
 
     private class ActivityLogEntry
     {
@@ -107,7 +247,7 @@
 
         /**
  * Constructor for the activity log entry.
- * 
+ *
  * @param user The user associated with the log entry.
  * @param action The action associated with the log entry.
  * @param timestamp The timestamp of the log entry.
@@ -120,3 +260,10 @@
         }
     }
 }
+
+
+
+
+
+
+
