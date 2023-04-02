@@ -17,10 +17,10 @@ namespace HealthCare.Server.Controllers
     {
         private readonly Methods.Validator m_validator;
         private readonly IDrugService m_service;
-        private readonly IDoctorAnalysis m_doctorAnalysis;
+        private readonly IDoctorService m_doctorAnalysis;
         private readonly ITokenService m_tokenService;
 
-        public DrugController(IDrugService a_drugService, ITokenService a_tokenService, IPermissionService a_permission, IDoctorAnalysis doctorAnalysis, ITokenService tokenService)
+        public DrugController(IDrugService a_drugService, ITokenService a_tokenService, IPermissionService a_permission, IDoctorService doctorAnalysis, ITokenService tokenService)
         {
             m_service = a_drugService;
             m_validator = new Methods.Validator(a_tokenService, a_permission);

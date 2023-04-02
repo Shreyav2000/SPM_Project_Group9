@@ -19,14 +19,6 @@ public partial class Prescriptiondetail
 
     public int? NoofDays { get; set; }
 
-    public decimal? Total { get; set; }
-
-    public decimal? DispTotal { get; set; }
-
-    public string? Notes { get; set; }
-
-    public bool? IsDispensed { get; set; }
-
     public DateTime? Ddate { get; set; }
 
     public bool? IsPrescriptionIssued { get; set; }

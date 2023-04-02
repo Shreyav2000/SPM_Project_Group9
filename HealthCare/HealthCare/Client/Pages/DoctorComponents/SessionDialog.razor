@@ -1,4 +1,4 @@
-﻿@page "/patient/sessiondialog/{record}/{drugs}"
+﻿@page "/patient/sessiondialog/{record}/{drugs}/{complaints}"
 @inject HttpClient Http
 @inject DialogService dialogService
 @inject TooltipService tooltipService
@@ -50,10 +50,19 @@
         </div>
         <div class="row">
             <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Complaints" /> <b></b>
+            </div>
+            <div class="col-md-8">
+                <RadzenListBox @bind-Value=@PatientComplaints Data=@Complaints TextProperty="Complaint1" ValueProperty="ComplaintId"
+                               Multiple=true AllowClear=true Placeholder="Select complaint" Style="width: 100%; max-width: 400px; height: 200px" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
                 <RadzenLabel Text="Notes" /> <b></b>
             </div>
             <div class="col-md-8">
-                <RadzenTextArea Value="@m_notes" Cols="50" Rows="10" Style="margin-bottom: 20px;margin-top:20px;" />
+                <RadzenTextArea @bind-Value="@m_notes" Cols="50" Rows="10" Style="margin-bottom: 20px;margin-top:20px;" />
             </div>
         </div>
     </RadzenFieldset>
@@ -104,16 +113,19 @@
     </RadzenDataGrid>
 </RadzenCard>
 <center>
-    <RadzenButton Click="Submit " Text="Submit" Style="margin-bottom: 10px; width: 150px" />
+    <RadzenButton Click="Submit " Text="Submit" Style="margin-bottom: 10px; width: 150px; background-color:green;" />
 </center>
 @code {
     [Parameter]
     public Patient record { get; set; }
 
     public List<Prescriptiondetail> Prescriptions { get; set; }
+    [Parameter]
+    public List<Complaint> Complaints { get; set; }
 
     [Parameter]
     public List<Drug> Drugs { get; set; }
+    public List<int> PatientComplaints { get; set; }
     private string m_notes { get; set; } = "|1. Complaints ( C/O ) :| \n |2. History Of Complaints ( HPC ) :| \n |3. On Direct Questions ( ODQ ) :| \n |4. Drug History ( DH ) :| \n |5. Past Medical History :| \n |6. Social Hisotry :|";
     Prescriptiondetail prescriptionToInsert;
     Prescriptiondetail prescriptionToUpdate;
@@ -135,6 +147,7 @@
     protected override Task OnInitializedAsync()
     {
         Prescriptions = new List<Prescriptiondetail>();
+        PatientComplaints = new List<int>();
         m_sessionId = int.Parse(String.Format("{0:d9}", (DateTime.Now.Ticks / 10) % 1000000000));
         return base.OnInitializedAsync();
     }
@@ -222,10 +235,12 @@
     async Task InsertRow()
     {
         prescriptionToInsert = new Prescriptiondetail()
-        {
-                ConsId = m_sessionId
-
-        };
+            {
+                ConsId = m_sessionId,
+                RecNo = int.Parse(String.Format("{0:d9}", (DateTime.Now.Ticks / 10) % 1000000000)),
+                Ddate = DateTime.Now,
+                PrescriptionSessionId = $"DR{m_sessionId}",
+            };
         await prescriptionsGrid.InsertRow(prescriptionToInsert);
         StateHasChanged();
     }
@@ -245,13 +260,27 @@
     /// <returns></returns>
     async Task Submit()
     {
+        List<Patientcomplaint> complaints = new List<Patientcomplaint>();
+        DateTime complaintTime = DateTime.Now;
+        foreach (int key in PatientComplaints)
+        {
+            complaints.Add(new Patientcomplaint
+                {
+                    ComplaintId = key,
+                    ConsultId = m_sessionId,
+                    PatientId = record.PatientId,
+                    PatientComplaintDate = complaintTime
+                });
+        }
         SessionObject session = new SessionObject
             {
+                Id = m_sessionId,
                 Patient = this.record,
-                Complaint = this.m_notes,
+                ComplaintNotes = this.m_notes,
+                Complaints = complaints,
                 Prescriptions = this.Prescriptions
             };
-        var responseMain = await Http.PostAsJsonAsync("api/Tokens/authenticate", session);
+        var responseMain = await Http.PostAsJsonAsync("api/staff/records/session", session);
         if (responseMain.IsSuccessStatusCode)
         {
             notificationMessage.Detail = "Record Saved succesfully !!! ";
@@ -262,7 +291,7 @@
             await ShowNotification(notificationMessage);
             dialogService.Close(session);
         }
-        else if (responseMain.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        else
         {
             notificationMessage.Detail = "An error occurred, please try again !!! ";
             notificationMessage.Summary = "Error Occurred";
@@ -271,6 +300,10 @@
 
             await ShowNotification(notificationMessage);
         }
+    }
+    private void HandleInput(string args)
+    {
+        m_notes = args.ToString();
     }
     /// <summary>
     /// Shows a notification message

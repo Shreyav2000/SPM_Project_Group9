@@ -16,12 +16,16 @@ namespace HealthCare.Client.Pages.DoctorComponents
         protected bool IsVisible { get; set; }
         private List<Patient> Patients { get; set; }
         private List<Drug> Drugs { get; set; }
+        public List<Complaint> Complaints { get; set; }
         private string m_patient { get; set; }
         private Timer timerObj;
+        private SessionObject m_previousSession { get; set; }
         protected override async Task OnInitializedAsync()
         {
             Patients = new List<Patient>();
             Drugs = new List<Drug>();
+            Complaints = new List<Complaint>();
+            m_previousSession = new SessionObject();
             if (Http.DefaultRequestHeaders == null)
             {
                 string token = await sessionStorage.GetItemAsync<string>("token");
@@ -29,6 +33,7 @@ namespace HealthCare.Client.Pages.DoctorComponents
                 Http.DefaultRequestHeaders.Authorization = authHeader;
             }
             await GetDrugs();
+            await GetComplaints();
             await getData();
 
             timerObj = new Timer(1500);
@@ -47,6 +52,21 @@ namespace HealthCare.Client.Pages.DoctorComponents
         private async void OnUserFinish(Object source, ElapsedEventArgs e)
         {
             await getData();
+        }
+        async Task GetComplaints()
+        {
+            ShowSpinner();
+            try
+            {
+                Complaints = await Http.GetFromJsonAsync<List<Complaint>>("api/staff/complaints");
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            HideSpinner();
         }
         async Task GetDrugs()
         {
@@ -110,14 +130,15 @@ namespace HealthCare.Client.Pages.DoctorComponents
         /// Opens Review dialog to show a more detail view of the AttendanceObject
         /// </summary>
         /// <param name="a_object"></param>
-        void openDialog(Patient a_object)
+        async Task openDialog(Patient a_object)
         {
-            dialogService.Open<SessionDialog>($"{a_object.Fname} {a_object.Lname}'s Session",
-                            new Dictionary<string, object>() { 
+            m_previousSession = await dialogService.OpenAsync<SessionDialog>($"{a_object.Fname} {a_object.Lname}'s Session",
+                              new Dictionary<string, object>() {
                                 { "record", a_object },
-                                { "drugs", Drugs}
-                                },
-                            new DialogOptions() { Width = "1000px", Height = "800px", ShowClose = true });
+                                { "drugs", Drugs},
+                                {"complaints",Complaints },
+                                  },
+                              new DialogOptions() { Width = "1000px", Height = "800px", ShowClose = true });
         }
     }
 }
