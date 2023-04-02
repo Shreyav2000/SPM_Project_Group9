@@ -29,6 +29,34 @@ namespace HealthCare.Server.Controllers
             m_validator = new Methods.Validator(a_tokenService, a_permissionService);
         }
 
+
+        /// <summary>
+        /// Gets all user roles from the database.
+        /// </summary>
+        /// <returns>An <see cref="IActionResult"/> containing the user roles.</returns>
+        /// <remarks>
+        /// If the user is not authenticated, a 401 Unauthorized response is returned.
+        /// If the user does not have the necessary permissions, a 403 Forbidden response is returned.
+        /// If the user roles were retrieved successfully, a 200 OK response is returned with the user roles.
+        /// If an error occurs, a 400 Bad Request response is returned with an error message.
+        /// </remarks>
+        [Authorize]
+        [HttpGet("getall")]
+        public async Task<IActionResult> GetAllUserRoles()
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 33);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            var userRoles = await m_service.GetAllUserRoles();
+            if (userRoles != null)
+                return Ok(userRoles);
+
+            return BadRequest("Error occurred, please try again later");
+        }
+
+
         /// <summary>
         /// Adds a new user role to the database.
         /// </summary>

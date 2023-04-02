@@ -9,6 +9,13 @@ namespace HealthCare.Shared.Interfaces
     /// </summary
     public interface IUserRoleService
     {
+
+        /// <summary>
+        /// Gets a list of all user roles in the system.
+        /// </summary>
+        /// <returns>A list of user roles.</returns>
+        Task<List<UserRole>> GetAllUserRoles();
+
         /// <summary>
         /// Adds a new user role to the system.
         /// </summary>
@@ -22,5 +29,7 @@ namespace HealthCare.Shared.Interfaces
         /// <param name="roleId">The ID of the user role to delete.</param>
         /// <returns>A boolean indicating whether the user role was deleted successfully.</returns>
         Task<bool> DeleteUserRole(int roleId);
+
+        
     }
 }
