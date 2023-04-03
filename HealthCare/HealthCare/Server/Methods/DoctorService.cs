@@ -57,6 +57,24 @@ namespace HealthCare.Server.Methods
                               Case = g.Key.Complaint1,
                           }).Take(5).ToListAsync();
         }
+
+        public async Task<SessionObject> GetSession(int a_consult)
+        {
+            Patientattendance attendance = m_context.Patientattendances.First(i => i.ConsultId == a_consult);
+            Patientcomplaintnote notes = m_context.Patientcomplaintnotes.First(i => i.ConsultId == a_consult);
+            Patient patient = m_context.Patients.First(i => i.PatientId == attendance.PatientId);
+            List<Prescriptiondetail> prescriptiondetails = await m_context.Prescriptiondetails.Where(p => p.ConsId == a_consult).ToListAsync();
+            List<Patientcomplaint> complaints = await m_context.Patientcomplaints.Where(i => i.ConsultId == a_consult).ToListAsync();
+            return new SessionObject
+            {
+                ComplaintNotes = notes.Notes,
+                Complaints = complaints,
+                Id = a_consult,
+                Patient = patient,
+                Prescriptions = prescriptiondetails
+            };
+        }
+
         /// <summary>
         /// Saves a consultation session to the database
         /// </summary>
@@ -131,6 +149,31 @@ namespace HealthCare.Server.Methods
                               Drug = g.Key.Drugname,
                               Count = g.Count(),
                           }).Take(5).ToListAsync();
+        }
+        /// <summary>
+        /// Updates a doctor session
+        /// </summary>
+        /// <param name="a_session"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateSession(SessionObject a_session)
+        {
+
+            Patientcomplaintnote notes = await m_context.Patientcomplaintnotes.FirstAsync(i => i.ConsultId == a_session.Id);
+            notes.Notes = a_session.ComplaintNotes;
+
+            try
+            {
+                m_context.Patientcomplaintnotes.Update(notes);
+                m_context.Prescriptiondetails.UpdateRange(a_session.Prescriptions);
+                m_context.Patientcomplaints.UpdateRange(a_session.Complaints);
+
+                return await m_context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+           
         }
     }
 }
