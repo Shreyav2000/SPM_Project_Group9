@@ -104,5 +104,40 @@ namespace HealthCare.Server.Methods
                 return null;
             }
         }
+
+        /// <summary>
+        /// Updates an existing user role in the database.
+        /// </summary>
+        /// <param name="userRole">The user role to update.</param>
+        /// <returns><c>true</c> if the user role was updated successfully,
+        /// otherwise <c>false</c>.</returns>
+        public async Task<bool> UpdateUserRole(UserRole userRole)
+        {
+            try
+            {
+                var existingUserRole = await m_context.UserRoles.FindAsync(userRole.RoleId);
+
+                if (existingUserRole == null)
+                {
+                    m_logger.LogWarning($"User role with Id {userRole.RoleId} was not found.");
+                    return false;
+                }
+
+                existingUserRole.RoleName = userRole.RoleName;
+
+                int i = await m_context.SaveChangesAsync();
+                if (i > 0)
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                m_logger.LogError(ex, $"Failed to update user role with Id {userRole.RoleId}.");
+
+            }
+
+            return false;
+        }
+
+
     }
 }
