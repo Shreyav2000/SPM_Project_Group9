@@ -52,6 +52,7 @@
                 <th>Role Id</th>
                 <th>Role Name</th>
                 <th>Delete Button</th>
+                <th>Edit Button</th>
             </tr>
         </thead>
         <tbody>
@@ -62,6 +63,10 @@
                     <td>@userRole.RoleName</td>
                     <td>
                         <button class="delete-btn" @onclick="() => DeleteUserRole(userRole.RoleId)">Delete</button>
+                    </td>
+                    <td>
+                        <button class="edit-btn" @onclick="() => UpdateUserRole(userRole.RoleId, userRole.RoleName)">Edit</button>
+
                     </td>
                 </tr>
             }
@@ -97,13 +102,7 @@
         </div>
     }
 
-
-
-
-
-
-
-}
+ }
 
 <button @onclick="ToggleMetrics">Toggle Metrics</button>
 <button @onclick="ToggleActivityLog">Toggle Activity Log</button>
@@ -216,8 +215,45 @@
         }
     }
 
+    //private async Task UpdateUserRole()
+    //{
+    //    // Send an HTTP POST request to the API to update the user role
+    //    var content = new StringContent(JsonConvert.SerializeObject(userRole), Encoding.UTF8, "application/json");
+    //    var response = await httpClient.PostAsync("api/UserRole/update", content);
 
+    //    if (response.IsSuccessStatusCode)
+    //    {
+    //        // Hide the edit dialog and update the user roles list
+    //        showEditUserRoleDialog = false;
+    //        await ToggleUserRoles();
+    //    }
+    //    else
+    //    {
+    //        // Show an error message
+    //        isError = true;
+    //        errorMessage = "Error occurred, please try again later";
+    //    }
+    //}
 
+    private async Task UpdateUserRole(int roleId, string newRoleName)
+    {
+        try
+        {
+            // Send an HTTP POST request to the API to update the user role
+            UserRole updatedUserRole = new UserRole { RoleId = roleId, RoleName = newRoleName };
+            var response = await httpClient.PostAsJsonAsync("api/UserRole/update", updatedUserRole);
+            response.EnsureSuccessStatusCode();
+
+            // Update the user role in the list
+            var index = userRoles.FindIndex(r => r.RoleId == roleId);
+            userRoles[index].RoleName = newRoleName;
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            errorMessage = ex.Message;
+        }
+    }
 
     /// <summary>
     /// deletes a user role from the database.

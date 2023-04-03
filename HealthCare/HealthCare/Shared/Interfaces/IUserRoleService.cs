@@ -30,6 +30,13 @@ namespace HealthCare.Shared.Interfaces
         /// <returns>A boolean indicating whether the user role was deleted successfully.</returns>
         Task<bool> DeleteUserRole(int roleId);
 
-        
+        /// <summary>
+        /// Updates an existing user role in the system.
+        /// </summary>
+        /// <param name="userRole">The user role to update.</param>
+        /// <returns>A boolean indicating whether the user role was updated successfully.</returns>
+        Task<bool> UpdateUserRole(UserRole userRole);
+
+
     }
 }
