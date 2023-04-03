@@ -52,6 +52,7 @@
                 <th>Role Id</th>
                 <th>Role Name</th>
                 <th>Delete Button</th>
+                
             </tr>
         </thead>
         <tbody>
@@ -98,12 +99,36 @@
     }
 
 
+  <button @onclick="() => showUpdateUserRoleDialog = true">Update User Role</button>
+
+  @if (showUpdateUserRoleDialog)
+   {
+     <div class="Update-user-role-dialog">
+        <h3> Update User Role</h3>
+        <form>
+            <div class="form-group">
+                <label for="roleId">Role ID:</label>
+                <input type="text" class="form-control" id="roleId" @bind-value="userRole.RoleId" />
+            </div>
+            <div class="form-group">
+                <label for="roleName">Role Name:</label>
+                <input type="text" class="form-control" id="roleName" @bind-value="userRole.RoleName" />
+            </div>
+            <button type="button" class="btn btn-primary" @onclick="UpdateUserRole">Edit Role</button>
+            <button type="button" class="btn btn-secondary" @onclick="() => showUpdateUserRoleDialog = false">Cancel</button>
+        </form>
+    </div>
+   }
 
 
+   @if (isError)
+   {
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+    }
 
-
-
-}
+ }
 
 <button @onclick="ToggleMetrics">Toggle Metrics</button>
 <button @onclick="ToggleActivityLog">Toggle Activity Log</button>
@@ -111,155 +136,176 @@
 
 @code {
     private bool showMetrics = false;
-    private bool showActivityLog = false;
-    private bool showUserRoles = true;
-    private double cpuUsage = 0.0;
-    private List<User> activityLog = new List<User>();
-    private List<UserRole> userRoles = new List<UserRole>();
-    private DateTime lastLogin;
-    private int roleId;
-    private UserRole userRole = new UserRole();
-    private bool showAddUserRoleDialog = false;
-    private string errorMessage = "";
-    private bool isError = false;
+        private bool showActivityLog = false;
+        private bool showUserRoles = true;
+        private double cpuUsage = 0.0;
+        private List<User> activityLog = new List<User>();
+        private List<UserRole> userRoles = new List<UserRole>();
+        private DateTime lastLogin;
+        private int roleId;
+        private string? RoleName;
+        private UserRole userRole = new UserRole();
+        private bool showAddUserRoleDialog = false;
+        private string errorMessage = "";
+        private bool isError = false;
+        private bool showUpdateUserRoleDialog = false;
 
-    /// <summary>
-    /// Toggles the display of system metrics.
-    /// </summary>
-    private void ToggleMetrics()
-    {
-        showMetrics = !showMetrics;
-    }
-
-    /// <summary>
-    /// Toggles the display of the user activity log.
-    /// </summary>
-    private void ToggleActivityLog()
-    {
-        showActivityLog = !showActivityLog;
-    }
-
-    // Simulate getting system metrics and activity log entries
-    protected override async Task OnInitializedAsync()
-    {
-        await GetLastLogins();
-        await GetSystemMetrics();
-        //await ToggleUserRoles();
-
-
-
-        StateHasChanged();
-    }
-    /// <summary>
-    /// Gets the last login from the API.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the list of last login entries.</returns>
-    async Task GetLastLogins()
-    {
-        var response = await httpClient.GetAsync("api/user/lastlogin");
-        if (response.IsSuccessStatusCode)
+        /// <summary>
+        /// Toggles the display of system metrics.
+        /// </summary>
+        private void ToggleMetrics()
         {
-            activityLog = await response.Content.ReadFromJsonAsync<List<User>>();
+            showMetrics = !showMetrics;
+        }
 
+        /// <summary>
+        /// Toggles the display of the user activity log.
+        /// </summary>
+        private void ToggleActivityLog()
+        {
+            showActivityLog = !showActivityLog;
+        }
+
+        // Simulate getting system metrics and activity log entries
+        protected override async Task OnInitializedAsync()
+        {
+            await GetLastLogins();
+            await GetSystemMetrics();
+            //await ToggleUserRoles();
+
+
+
+            StateHasChanged();
+        }
+        /// <summary>
+        /// Gets the last login from the API.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the list of last login entries.</returns>
+        async Task GetLastLogins()
+        {
+            var response = await httpClient.GetAsync("api/user/lastlogin");
+            if (response.IsSuccessStatusCode)
+            {
+                activityLog = await response.Content.ReadFromJsonAsync<List<User>>();
+
+            }
+        }
+        async Task GetSystemMetrics()
+        {
+            var response = await httpClient.GetAsync("api/systemmetrics");
+            if (response.IsSuccessStatusCode)
+            {
+                var metrics = await response.Content.ReadFromJsonAsync<SystemMetrics>();
+                cpuUsage = metrics.cpuUsage;
+
+            }
+        }
+        /// <summary>
+        /// Toggles the display of user roles.
+        /// </summary>
+
+        async Task ToggleUserRoles()
+        {
+
+            // Otherwise, retrieve user roles from the API and show them
+            try
+            {
+                showUserRoles = !showUserRoles;
+                userRoles = await httpClient.GetFromJsonAsync<List<UserRole>>("api/UserRole/getall");
+
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine("Error retrieving user roles: " + ex.Message);
+            }
+        }
+
+
+        ///// <summary>
+        ///// Adds a user role to the database.
+        ///// </summary>
+        
+        private async Task AddUserRole()
+        {
+            try
+            {
+                var response = await httpClient.PostAsJsonAsync("api/UserRole/add", userRole);
+                response.EnsureSuccessStatusCode();
+                userRole = new UserRole();
+                await ToggleUserRoles();
+            }
+            catch (Exception ex)
+            {
+                isError = true;
+                errorMessage = ex.Message;
+            }
+        }
+        ///// <summary>
+        ///// Updates a user role to the database.
+        ///// </summary>
+        
+        private async Task UpdateUserRole()
+        {
+            // Send an HTTP POST request to the API to update the user role
+            var content = new StringContent(JsonConvert.SerializeObject(userRole), Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("api/UserRole/update", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Hide the edit dialog and update the user roles list
+                showUpdateUserRoleDialog = true;
+                await ToggleUserRoles();
+            }
+            else
+            {
+                // Show an error message
+                isError = true;
+                errorMessage = "Error occurred, please try again later";
+            }
+        }
+
+        ///// <summary>
+        ///// Deletes a user role to the database.
+        ///// </summary>
+        
+
+        private async Task DeleteUserRole(int roleId)
+        {
+            var response = await httpClient.PostAsync($"api/UserRole/delete?roleId={roleId}", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(result);
+                userRoles.RemoveAll(ur => ur.RoleId == roleId);
+            }
+            else
+            {
+                Console.WriteLine("Failed to delete user role");
+            }
+        }
+
+        private class ActivityLogEntry
+        {
+            public string User { get; set; }
+            public string Action { get; set; }
+            public DateTime Timestamp { get; set; }
+
+            /**
+     * Constructor for the activity log entry.
+     *
+     * @param user The user associated with the log entry.
+     * @param action The action associated with the log entry.
+     * @param timestamp The timestamp of the log entry.
+     */
+            public ActivityLogEntry(string user, string action, DateTime timestamp)
+            {
+                User = user;
+                Action = action;
+                Timestamp = timestamp;
+            }
         }
     }
-    async Task GetSystemMetrics()
-    {
-        var response = await httpClient.GetAsync("api/systemmetrics");
-        if (response.IsSuccessStatusCode)
-        {
-            var metrics = await response.Content.ReadFromJsonAsync<SystemMetrics>();
-            cpuUsage = metrics.cpuUsage;
-
-        }
-    }
-    /// <summary>
-    /// Toggles the display of user roles.
-    /// </summary>
-
-    async Task ToggleUserRoles()
-    {
-
-        // Otherwise, retrieve user roles from the API and show them
-        try
-        {
-            showUserRoles = !showUserRoles;
-            userRoles = await httpClient.GetFromJsonAsync<List<UserRole>>("api/UserRole/getall");
-
-        }
-        catch (HttpRequestException ex)
-        {
-            Console.WriteLine("Error retrieving user roles: " + ex.Message);
-        }
-    }
-
-
-    ///// <summary>
-    ///// Adds a user role to the database.
-    ///// </summary>
-    ///// <summary>
-    ///// Adds a user role to the database.
-    ///// </summary>
-    private async Task AddUserRole()
-    {
-        try
-        {
-            var response = await httpClient.PostAsJsonAsync("api/UserRole/add", userRole);
-            response.EnsureSuccessStatusCode();
-            userRole = new UserRole();
-            await ToggleUserRoles();
-        }
-        catch (Exception ex)
-        {
-            isError = true;
-            errorMessage = ex.Message;
-        }
-    }
-
-
-
-
-    /// <summary>
-    /// deletes a user role from the database.
-    /// </summary>
-
-    private async Task DeleteUserRole(int roleId)
-    {
-        var response = await httpClient.PostAsync($"api/UserRole/delete?roleId={roleId}", null);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var result = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(result);
-            userRoles.RemoveAll(ur => ur.RoleId == roleId);
-        }
-        else
-        {
-            Console.WriteLine("Failed to delete user role");
-        }
-    }
-
-    private class ActivityLogEntry
-    {
-        public string User { get; set; }
-        public string Action { get; set; }
-        public DateTime Timestamp { get; set; }
-
-        /**
- * Constructor for the activity log entry.
- *
- * @param user The user associated with the log entry.
- * @param action The action associated with the log entry.
- * @param timestamp The timestamp of the log entry.
- */
-        public ActivityLogEntry(string user, string action, DateTime timestamp)
-        {
-            User = user;
-            Action = action;
-            Timestamp = timestamp;
-        }
-    }
-}
 
 
 

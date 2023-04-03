@@ -108,5 +108,35 @@ namespace HealthCare.Server.Controllers
 
             return BadRequest("Error occurred, please try again later");
         }
+
+        /// <summary>
+        /// Updates an existing user role in the database.
+        /// </summary>
+        /// <param name="userRole">The updated user role.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
+        /// <remarks>
+        /// If the user is not authenticated, a 401 Unauthorized response is returned.
+        /// If the user does not have the necessary permissions, a 403 Forbidden response is returned.
+        /// If the user role was updated successfully, a 200 OK response is returned with a message.
+        /// If an error occurs, a 400 Bad Request response is returned with an error message.
+        /// </remarks>
+        [Authorize]
+        [HttpPost("update")]
+        public async Task<IActionResult> UpdateUserRole(UserRole userRole)
+        {
+            // Validate user's token and permissions
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 35);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            // Attempt to update user role in the database
+            if (await m_service.UpdateUserRole(userRole))
+                return Ok("User role updated successfully");
+
+            return BadRequest("Error occurred, please try again later");
+        }
+
+
     }
 }
