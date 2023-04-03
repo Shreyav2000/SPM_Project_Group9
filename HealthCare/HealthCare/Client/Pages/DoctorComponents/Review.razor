@@ -91,7 +91,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Prescriptiondetail" Title="Action">
                 <Template Context="patient">
-                    <RadzenButton Text="Edit" Style="background-color:royalblue;" Click="@(args => EditRow(patient))" />
+                    <RadzenButton Text="Edit" Style="background-color:forestgreen;" Click="@(args => EditRow(patient))" />
                     <RadzenButton Text="Remove" Style="background-color:darkred;" Click="@(args => DeleteRow(patient))" />
                 </Template>
                 <EditTemplate Context="order">
