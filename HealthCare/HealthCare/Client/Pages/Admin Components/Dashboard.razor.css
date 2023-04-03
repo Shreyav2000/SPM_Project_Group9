@@ -44,9 +44,9 @@ th {
 /* Style the buttons */
 button {
     background-color: #4CAF50;
-    border: none;
+    border: outset;
     color: white;
-    padding: 12px 20px;
+    padding: 17px 29px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
