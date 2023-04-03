@@ -155,17 +155,47 @@ namespace HealthCare.Server.Methods
         /// </summary>
         /// <param name="a_session"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateSession(SessionObject a_session)
+        public async Task<bool> UpdateSession(SessionObject a_session, int? a_doctorId)
         {
 
             Patientcomplaintnote notes = await m_context.Patientcomplaintnotes.FirstAsync(i => i.ConsultId == a_session.Id);
             notes.Notes = a_session.ComplaintNotes;
 
+            List<Prescriptiondetail> todelete = m_context.Prescriptiondetails.Where(i => i.ConsId == a_session.Id).ToList();
+            Prescription? prescription = m_context.Prescriptions.FirstOrDefault(i => i.ConsId == a_session.Id);
+
+            List<Patientcomplaint> patientcomplaints = await m_context.Patientcomplaints.Where(i => i.ConsultId == a_session.Id).ToListAsync();
+
+            bool prescriptionFound = prescription != null;
+            if (prescription == null)
+            {
+                prescriptionFound = false;
+                prescription = new Prescription
+                {
+                    Id = int.Parse(String.Format("{0:d9}", (DateTime.Now.Ticks / 10) % 1000000000)),
+                    PatientId = a_session.Patient.PatientId,
+                    ConsId = a_session.Id,
+                    PatientNo = a_session.Patient.PatientNo!,
+                    DoctorRequesting = a_doctorId!,
+                    TransDate = DateTime.Now,
+                    PrescriptionSessionId = $"DR{a_session.Id}",
+                };
+            }
+
             try
             {
+                if (todelete.Count > 0)
+                    m_context.Prescriptiondetails.RemoveRange(todelete);
+
+                if (patientcomplaints.Count > 0)
+                    m_context.Patientcomplaints.RemoveRange(patientcomplaints);
                 m_context.Patientcomplaintnotes.Update(notes);
-                m_context.Prescriptiondetails.UpdateRange(a_session.Prescriptions);
-                m_context.Patientcomplaints.UpdateRange(a_session.Complaints);
+                if (!prescriptionFound)
+                    m_context.Prescriptions.Add(prescription);
+
+                m_context.Prescriptiondetails.AddRange(a_session.Prescriptions);
+
+                m_context.Patientcomplaints.AddRange(a_session.Complaints);
 
                 return await m_context.SaveChangesAsync() > 0;
             }
@@ -173,7 +203,7 @@ namespace HealthCare.Server.Methods
             {
                 return false;
             }
-           
+
         }
     }
 }

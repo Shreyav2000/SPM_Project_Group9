@@ -1,5 +1,6 @@
 ﻿using HealthCare.Shared.Models;
 using HealthCare.Shared.Objects;
+using Microsoft.Diagnostics.Tracing.Parsers.Clr;
 using Radzen;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -91,7 +92,7 @@ namespace HealthCare.Client.Pages.DoctorComponents
             ShowSpinner();
             try
             {
-                SessionObject session = await Http.GetFromJsonAsync<SessionObject>("api/staff/session/" + a_consultId.ToString());
+                SessionObject session = await Http.GetFromJsonAsync<SessionObject>("api/staff/records/session/" + a_consultId.ToString());
                 HideSpinner();
                 return session;
 
@@ -147,13 +148,16 @@ namespace HealthCare.Client.Pages.DoctorComponents
             SessionObject session = await getSessionData(a_object.ConsultId!.Value);
             List<Drug> drugs = await GetDrugs();
             List<Complaint> complaints = await GetComplaints();
-            dialogService.Open<Review>($"{a_object.PatientName}'s Session Review",
+            await dialogService.OpenAsync<Review>($"{a_object.PatientName}'s Session Review",
                             new Dictionary<string, object>() {
                                 { "session", session },
                                 { "complaints", complaints },
                                 { "drugs", drugs },
                                       },
                             new DialogOptions() { Width = "1000px", Height = "800px", ShowClose = true });
+
+            
+                await getData();
         }
     }
 }

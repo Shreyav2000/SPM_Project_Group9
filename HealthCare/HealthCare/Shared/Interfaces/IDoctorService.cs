@@ -15,6 +15,6 @@ namespace HealthCare.Shared.Interfaces
         Task<List<Cases>> Cases(DateTime a_start, DateTime a_end, int a_doctorId);
         Task<bool> SubmitSession(SessionObject sessionObject, int a_doctorId);
         Task<SessionObject> GetSession(int a_consult);
-        Task<bool> UpdateSession(SessionObject a_session);
+        Task<bool> UpdateSession(SessionObject a_session,int? a_doctorId);
     }
 }

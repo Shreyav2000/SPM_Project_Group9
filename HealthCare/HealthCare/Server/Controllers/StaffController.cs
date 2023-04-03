@@ -110,7 +110,7 @@ namespace HealthCare.Server.Controllers
             if (!string.IsNullOrEmpty(validationResult))
                 return BadRequest(validationResult);
 
-            if (await m_doctorService.UpdateSession(a_session))
+            if (await m_doctorService.UpdateSession(a_session,doctor))
                 return Ok("success");
 
             return BadRequest("Error occurred, session not updated");

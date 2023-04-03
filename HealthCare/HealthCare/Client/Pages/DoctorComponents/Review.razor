@@ -9,6 +9,7 @@
 @inject NavigationManager NavigationManager
 @using Faso.Blazor.SpinKit
 @inject SpinnerService SpinnerService
+@inject Radzen.NotificationService notificationService
 
 
 <RadzenCard Style="margin-bottom: 20px;">
@@ -17,29 +18,29 @@
             <RadzenLabel Text="Date Attended Hospital" />
         </div>
         <div class="col-md-8">
-            <RadzenLabel Text=@session.Prescriptions.First().Ddate.Value.ToLongDateString()/>
+            <RadzenLabel Text=@session.Prescriptions.First().Ddate.Value.ToLongDateString() />
         </div>
     </div>
-  
-        <RadzenFieldset Text="Patient's Info" Style="width:100%;">
-            <div class="row">
-                <div class="col-md-4 align-items-center d-flex">
-                    <RadzenLabel Text="Name of Patient" />
-                </div>
-                <div class="col-md-8">
-                   @session.Patient.Fname @session.Patient.Lname
-                </div>
+
+    <RadzenFieldset Text="Patient's Info" Style="width:100%;">
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Name of Patient" />
             </div>
-            
-            <div class="row">
-                <div class="col-md-4 align-items-center d-flex">
-                    <RadzenLabel Text="Patient's ID Number" />
-                </div>
-                <div class="col-md-8">
-                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cID" @bind-Value="@session.Patient.PatientNo" />
-                </div>
+            <div class="col-md-8">
+                @session.Patient.Fname @session.Patient.Lname
             </div>
-         
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Patient's ID Number" />
+            </div>
+            <div class="col-md-8">
+                <RadzenTextBox Disabled="true" style="width: 100%;" Name="cID" @bind-Value="@session.Patient.PatientNo" />
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-4 align-items-center d-flex">
                 <RadzenLabel Text="Complaints" /> <b></b>
@@ -57,7 +58,7 @@
                 <RadzenTextArea @bind-Value="@session.ComplaintNotes" Cols="50" Rows="10" Style="margin-bottom: 20px;margin-top:20px;" />
             </div>
         </div>
-        </RadzenFieldset>
+    </RadzenFieldset>
     <div class="row" style="display:flex;justify-content:end;margin-top:10px;margin-bottom:10px;">
         <RadzenButton Text="Prescribe Drug" Style="width:180px;background-color:green;" Click="@InsertRow" Disabled=@(prescriptionToInsert != null || prescriptionToUpdate != null) />
     </div>
@@ -106,11 +107,12 @@
 
 </RadzenCard>
 <center>
-    <RadzenButton Click="@( () => dialogService.Close(true))" Text="Update" Style="margin-bottom: 10px; width: 150px" />
+    <RadzenButton Click="Submit" Text="Update" Style="margin-bottom: 10px; width: 150px" />
 </center>
 @code {
     [Parameter]
-    public SessionObject session { get; set; }
+    public SessionObject? session { get; set; }
+
     public List<Prescriptiondetail> Prescriptions { get; set; }
     [Parameter]
     public List<Complaint> Complaints { get; set; }
@@ -133,13 +135,16 @@
     "TDS",
     "WEEKLY"
     };
+    bool m_requiredReload = false;
     protected override Task OnInitializedAsync()
     {
         Prescriptions = session.Prescriptions;
         PatientComplaints = session.Complaints.Select(i => i.ComplaintId).ToList();
         
+
         return base.OnInitializedAsync();
     }
+    
 
     void Reset()
     {
@@ -243,5 +248,68 @@
         Prescriptions.Add(a_prescription);
         prescriptionToInsert = null;
     }
+    /// <summary>
+    /// Updates the details of the session
+    /// </summary>
+    /// <returns></returns>
+    async Task Submit()
+    {
+        if (session != null)
+        {
+            List<Patientcomplaint> complaints = new List<Patientcomplaint>();
+            DateTime complaintTime = DateTime.Now;
+            foreach (int key in PatientComplaints)
+            {
+                complaints.Add(new Patientcomplaint
+                    {
+                        ComplaintId = key,
+                        ConsultId = this.session.Id,
+                        PatientId = this.session.Patient.PatientId,
+                        PatientComplaintDate = complaintTime
+                    });
+            }
+            SessionObject session = new SessionObject
+                {
+                    Id = this.session.Id,
+                    Patient = this.session.Patient,
+                    ComplaintNotes = this.session.ComplaintNotes,
+                    Complaints = complaints,
+                    Prescriptions = this.Prescriptions
+                };
+            var responseMain = await Http.PutAsJsonAsync("api/staff/records/session", session);
+            if (responseMain.IsSuccessStatusCode)
+            {
+                notificationMessage.Detail = "Record Updated succesfully !!! ";
+                notificationMessage.Summary = "Session Update";
+                notificationMessage.Severity = NotificationSeverity.Success;
+                notificationMessage.Duration = 5000;
 
+                await ShowNotification(notificationMessage);
+                m_requiredReload = true;
+            }
+            else
+            {
+                notificationMessage.Detail = "An error occurred, please try again !!! ";
+                notificationMessage.Summary = "Error Occurred";
+                notificationMessage.Severity = NotificationSeverity.Error;
+                notificationMessage.Duration = 5000;
+
+                await ShowNotification(notificationMessage);
+
+                if (!m_requiredReload)
+                    m_requiredReload = false;
+            }
+        }
+    }
+    /// <summary>
+    /// Shows a notification message
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    async Task ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
 }
