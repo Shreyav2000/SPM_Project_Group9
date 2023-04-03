@@ -38,7 +38,7 @@
                     <RadzenLabel Text="@m_previousSession.Prescriptions.First().Ddate.Value.ToLongDateString()" />
                 </div>
                 <RadzenTextArea Disabled="true" Value="@m_previousSession.ComplaintNotes" Cols="40" Rows="5" Style="margin-bottom: 20px;margin-top:20px;" />
-                <RadzenButton Text="Review" Style="background-color:green;" />
+                <RadzenButton Text="Review" Style="background-color:green;" Click="openSessionDialog" />
             </div>
         </div>
 

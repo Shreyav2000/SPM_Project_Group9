@@ -57,6 +57,24 @@ namespace HealthCare.Server.Methods
                               Case = g.Key.Complaint1,
                           }).Take(5).ToListAsync();
         }
+
+        public async Task<SessionObject> GetSession(int a_consult)
+        {
+            Patientattendance attendance = m_context.Patientattendances.First(i => i.ConsultId == a_consult);
+            Patientcomplaintnote notes = m_context.Patientcomplaintnotes.First(i => i.ConsultId == a_consult);
+            Patient patient = m_context.Patients.First(i => i.PatientId == attendance.PatientId);
+            List<Prescriptiondetail> prescriptiondetails = await m_context.Prescriptiondetails.Where(p => p.ConsId == a_consult).ToListAsync();
+            List<Patientcomplaint> complaints = await m_context.Patientcomplaints.Where(i => i.ConsultId == a_consult).ToListAsync();
+            return new SessionObject
+            {
+                ComplaintNotes = notes.Notes,
+                Complaints = complaints,
+                Id = a_consult,
+                Patient = patient,
+                Prescriptions = prescriptiondetails
+            };
+        }
+
         /// <summary>
         /// Saves a consultation session to the database
         /// </summary>
@@ -131,6 +149,61 @@ namespace HealthCare.Server.Methods
                               Drug = g.Key.Drugname,
                               Count = g.Count(),
                           }).Take(5).ToListAsync();
+        }
+        /// <summary>
+        /// Updates a doctor session
+        /// </summary>
+        /// <param name="a_session"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateSession(SessionObject a_session, int? a_doctorId)
+        {
+
+            Patientcomplaintnote notes = await m_context.Patientcomplaintnotes.FirstAsync(i => i.ConsultId == a_session.Id);
+            notes.Notes = a_session.ComplaintNotes;
+
+            List<Prescriptiondetail> todelete = m_context.Prescriptiondetails.Where(i => i.ConsId == a_session.Id).ToList();
+            Prescription? prescription = m_context.Prescriptions.FirstOrDefault(i => i.ConsId == a_session.Id);
+
+            List<Patientcomplaint> patientcomplaints = await m_context.Patientcomplaints.Where(i => i.ConsultId == a_session.Id).ToListAsync();
+
+            bool prescriptionFound = prescription != null;
+            if (prescription == null)
+            {
+                prescriptionFound = false;
+                prescription = new Prescription
+                {
+                    Id = int.Parse(String.Format("{0:d9}", (DateTime.Now.Ticks / 10) % 1000000000)),
+                    PatientId = a_session.Patient.PatientId,
+                    ConsId = a_session.Id,
+                    PatientNo = a_session.Patient.PatientNo!,
+                    DoctorRequesting = a_doctorId!,
+                    TransDate = DateTime.Now,
+                    PrescriptionSessionId = $"DR{a_session.Id}",
+                };
+            }
+
+            try
+            {
+                if (todelete.Count > 0)
+                    m_context.Prescriptiondetails.RemoveRange(todelete);
+
+                if (patientcomplaints.Count > 0)
+                    m_context.Patientcomplaints.RemoveRange(patientcomplaints);
+                m_context.Patientcomplaintnotes.Update(notes);
+                if (!prescriptionFound)
+                    m_context.Prescriptions.Add(prescription);
+
+                m_context.Prescriptiondetails.AddRange(a_session.Prescriptions);
+
+                m_context.Patientcomplaints.AddRange(a_session.Complaints);
+
+                return await m_context.SaveChangesAsync() > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
         }
     }
 }

@@ -79,5 +79,41 @@ namespace HealthCare.Server.Controllers
 
             return BadRequest("Error occurred");
         }
+
+        /// <summary>
+        /// Endpoint get consulting session between a doctor and a patient
+        /// </summary>
+        /// <param name="a_sessionId"></param>
+        [Authorize]
+        [HttpGet, Route("records/session/{a_sessionId}")]
+        public async Task<ActionResult<SessionObject>> GetRecord(int a_sessionId)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 3);
+            int? doctor = m_tokenService.GetUserIdFromToken(token);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            return await m_doctorService.GetSession(a_sessionId);
+        }
+        /// <summary>
+        /// Endpoint update consulting session between a doctor and a patient
+        /// </summary>
+        /// <param name="a_sessionId"></param>
+        [Authorize]
+        [HttpPut, Route("records/session")]
+        public async Task<ActionResult> UpdateRecord(SessionObject a_session)
+        {
+            string token = Request.Headers[HeaderNames.Authorization]!;
+            string? validationResult = m_validator.Validate(token, 3);
+            int? doctor = m_tokenService.GetUserIdFromToken(token);
+            if (!string.IsNullOrEmpty(validationResult))
+                return BadRequest(validationResult);
+
+            if (await m_doctorService.UpdateSession(a_session,doctor))
+                return Ok("success");
+
+            return BadRequest("Error occurred, session not updated");
+        }
     }
 }

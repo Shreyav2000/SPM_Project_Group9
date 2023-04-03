@@ -140,5 +140,20 @@ namespace HealthCare.Client.Pages.DoctorComponents
                                   },
                               new DialogOptions() { Width = "1000px", Height = "800px", ShowClose = true });
         }
+        /// <summary>
+        /// Opens Review dialog to show a more detail view of the session
+        /// </summary>
+        /// <param name="a_object"></param>
+        async Task openSessionDialog()
+        {
+            await dialogService.OpenAsync<Review>($"{m_previousSession.Patient.Fname} {m_previousSession.Patient.Lname}'s Session Review",
+                            new Dictionary<string, object>() {
+                                { "session", m_previousSession },
+                                { "complaints", Complaints },
+                                { "drugs", Drugs },
+                                      },
+                            new DialogOptions() { Width = "1000px", Height = "800px", ShowClose = true });
+
+        }
     }
 }

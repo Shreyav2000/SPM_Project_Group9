@@ -1,13 +1,15 @@
-﻿@page "/patient/review/{record}"
+﻿@page "/patient/review/{session}/{complaints}/{drugs}"
 @inject HttpClient Http
 @inject DialogService dialogService
 @inject TooltipService tooltipService
+@using HealthCare.Shared.Models;
 @using HealthCare.Shared.Objects;
 @using Newtonsoft.Json;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavigationManager
 @using Faso.Blazor.SpinKit
 @inject SpinnerService SpinnerService
+@inject Radzen.NotificationService notificationService
 
 
 <RadzenCard Style="margin-bottom: 20px;">
@@ -16,49 +18,298 @@
             <RadzenLabel Text="Date Attended Hospital" />
         </div>
         <div class="col-md-8">
-            <RadzenLabel Text=@record.Timestamp.ToLongDateString() />
+            <RadzenLabel Text=@session.Prescriptions.First().Ddate.Value.ToLongDateString() />
         </div>
     </div>
-  
-        <RadzenFieldset Text="Patient's Info" Style="width:100%;">
-            <div class="row">
-                <div class="col-md-4 align-items-center d-flex">
-                    <RadzenLabel Text="Name of Patient" />
-                </div>
-                <div class="col-md-8">
-                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cFullname" @bind-Value="record.PatientName" />
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-4 align-items-center d-flex">
-                    <RadzenLabel Text="Patient's ID Number" />
-                </div>
-                <div class="col-md-8">
-                    <RadzenTextBox Disabled="true" style="width: 100%;" Name="cID" @bind-Value="@record.PatientId" />
-                </div>
-            </div>
-         
-        </RadzenFieldset>
-        <RadzenFieldset>
 
-                <div class="row">
-                    <div class="col-md-4 align-items-center d-flex">
-                        <RadzenLabel Text="Notes" /> <b></b>
-                    </div>
-                    <div class="col-md-8">
-                        <RadzenTextArea Disabled="true" @bind-Value="@record.Notes" Cols="50" Rows="10" Style="margin-bottom: 20px;margin-top:20px;" />
-                    </div>
-                </div>
-         
-        </RadzenFieldset>
+    <RadzenFieldset Text="Patient's Info" Style="width:100%;">
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Name of Patient" />
+            </div>
+            <div class="col-md-8">
+                @session.Patient.Fname @session.Patient.Lname
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Patient's ID Number" />
+            </div>
+            <div class="col-md-8">
+                <RadzenTextBox Disabled="true" style="width: 100%;" Name="cID" @bind-Value="@session.Patient.PatientNo" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Complaints" /> <b></b>
+            </div>
+            <div class="col-md-8">
+                <RadzenListBox @bind-Value=@PatientComplaints Data=@Complaints TextProperty="Complaint1" ValueProperty="ComplaintId"
+                               Multiple=true AllowClear=true Placeholder="Select complaint" Style="width: 100%; max-width: 400px; height: 200px" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 align-items-center d-flex">
+                <RadzenLabel Text="Notes" /> <b></b>
+            </div>
+            <div class="col-md-8">
+                <RadzenTextArea @bind-Value="@session.ComplaintNotes" Cols="50" Rows="10" Style="margin-bottom: 20px;margin-top:20px;" />
+            </div>
+        </div>
+    </RadzenFieldset>
+    <div class="row" style="display:flex;justify-content:end;margin-top:10px;margin-bottom:10px;">
+        <RadzenButton Text="Prescribe Drug" Style="width:180px;background-color:green;" Click="@InsertRow" Disabled=@(prescriptionToInsert != null || prescriptionToUpdate != null) />
+    </div>
+    <RadzenDataGrid @ref="prescriptionsGrid" Data=@Prescriptions Style="height: 500px" AllowFiltering="false" AllowSorting="false" EditMode="DataGridEditMode.Single"
+                    TItem="Prescriptiondetail" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset">
+        <Columns>
+            <RadzenDataGridColumn TItem="Prescriptiondetail" Property="Drug" Title="Drug" Width="300px">
+                <Template Context="drug">
+                    <b>@Drugs.First(i => i.DrugId == drug.DrugId).Drugname</b>
+                </Template>
+                <EditTemplate Context="drug">
+                    <RadzenDropDown @bind-Value="drug.DrugId" Data="@Drugs" TextProperty="Drugname" ValueProperty="DrugId" Style="width:100%; display: block;" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Prescriptiondetail" Title="FrequencyQty">
+                <Template Context="drug">
+                    <b>@drug.FrequencyQty</b>
+                </Template>
+                <EditTemplate Context="order">
+                    <RadzenNumeric @bind-Value="order.FrequencyQty" Style="width:100%" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Prescriptiondetail" Title="Frequency">
+                <Template Context="drug">
+                    @drug.Frequency
+                </Template>
+                <EditTemplate Context="drug">
+                    <RadzenDropDown @bind-Value="drug.Frequency" Data="@Frequency" Style="width:100%; display: block;" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Prescriptiondetail" Title="Action">
+                <Template Context="patient">
+                    <RadzenButton Text="Remove" Style="background-color:darkred;" Click="@(args => DeleteRow(patient))" />
+                </Template>
+                <EditTemplate Context="order">
+                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(order))">
+                    </RadzenButton>
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(order))">
+                    </RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(order))">
+                    </RadzenButton>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
 
 </RadzenCard>
 <center>
-    <RadzenButton Click="@( () => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+    <RadzenButton Click="Submit" Text="Update" Style="margin-bottom: 10px; width: 150px" />
 </center>
 @code {
     [Parameter]
-    public AttendanceObject record { get; set; }
+    public SessionObject? session { get; set; }
 
+    public List<Prescriptiondetail> Prescriptions { get; set; }
+    [Parameter]
+    public List<Complaint> Complaints { get; set; }
+    [Parameter]
+    public List<Drug> Drugs { get; set; }
+    public List<int> PatientComplaints { get; set; }
+    Prescriptiondetail prescriptionToInsert;
+    Prescriptiondetail prescriptionToUpdate;
+    RadzenDataGrid<Prescriptiondetail> prescriptionsGrid;
+    NotificationMessage notificationMessage = new NotificationMessage();
+    private List<string> Frequency = new List<string>
+    {
+    "BD",
+    "MANE",
+    "NOCTE",
+    "OD",
+    "PRN",
+    "QDS",
+    "STAT",
+    "TDS",
+    "WEEKLY"
+    };
+    bool m_requiredReload = false;
+    protected override Task OnInitializedAsync()
+    {
+        Prescriptions = session.Prescriptions;
+        PatientComplaints = session.Complaints.Select(i => i.ComplaintId).ToList();
+        
+
+        return base.OnInitializedAsync();
+    }
+    
+
+    void Reset()
+    {
+        prescriptionToInsert = null;
+        prescriptionToUpdate = null;
+    }
+    async Task EditRow(Prescriptiondetail a_drug)
+    {
+        prescriptionToUpdate = a_drug;
+        await prescriptionsGrid.EditRow(a_drug);
+    }
+    /// <summary>
+    /// Handles the update event of the prescription Grid
+    /// </summary>
+    /// <param name="a_prescription"></param>
+    void OnUpdateRow(Prescriptiondetail a_prescription)
+    {
+        if (a_prescription == prescriptionToInsert)
+        {
+            prescriptionToInsert = null;
+        }
+
+        prescriptionToUpdate = null;
+    }
+    /// <summary>
+    /// Accepts changes to the prescription grid
+    /// </summary>
+    /// <param name="a_prescription"></param>
+    /// <returns></returns>
+    async Task SaveRow(Prescriptiondetail a_prescription)
+    {
+        await prescriptionsGrid.UpdateRow(a_prescription);
+    }
+    /// <summary>
+    /// Cancels the edit of prescription
+    /// </summary>
+    /// <param name="a_prescription"></param>
+    void CancelEdit(Prescriptiondetail a_prescription)
+    {
+        if (a_prescription == prescriptionToInsert)
+        {
+            prescriptionToInsert = null;
+        }
+
+        prescriptionToUpdate = null;
+
+        prescriptionsGrid.CancelEditRow(a_prescription);
+    }
+    /// <summary>
+    /// Removes a prescription from the list
+    /// </summary>
+    /// <param name="a_prescription"></param>
+    /// <returns></returns>
+    async Task DeleteRow(Prescriptiondetail a_prescription)
+    {
+        if (a_prescription == prescriptionToInsert)
+        {
+            prescriptionToInsert = null;
+        }
+
+        if (a_prescription == prescriptionToUpdate)
+        {
+            prescriptionToUpdate = null;
+        }
+
+        if (Prescriptions.Contains(a_prescription))
+        {
+            Prescriptions.Remove(a_prescription);
+
+            await prescriptionsGrid.Reload();
+        }
+        else
+        {
+            prescriptionsGrid.CancelEditRow(a_prescription);
+            await prescriptionsGrid.Reload();
+        }
+    }
+    /// <summary>
+    /// Inserts a new row in the datagrid
+    /// </summary>
+    /// <returns></returns>
+    async Task InsertRow()
+    {
+        prescriptionToInsert = new Prescriptiondetail()
+            {
+                ConsId = session.Id,
+                RecNo = int.Parse(String.Format("{0:d9}", (DateTime.Now.Ticks / 10) % 1000000000)),
+                Ddate = DateTime.Now,
+                PrescriptionSessionId = $"DR{session.Id}",
+            };
+        await prescriptionsGrid.InsertRow(prescriptionToInsert);
+        StateHasChanged();
+    }
+
+    //// <summary>
+    /// On new row created event handler
+    /// </summary>
+    /// <param name="a_prescription"></param>
+    void OnCreateRow(Prescriptiondetail a_prescription)
+    {
+        Prescriptions.Add(a_prescription);
+        prescriptionToInsert = null;
+    }
+    /// <summary>
+    /// Updates the details of the session
+    /// </summary>
+    /// <returns></returns>
+    async Task Submit()
+    {
+        if (session != null)
+        {
+            List<Patientcomplaint> complaints = new List<Patientcomplaint>();
+            DateTime complaintTime = DateTime.Now;
+            foreach (int key in PatientComplaints)
+            {
+                complaints.Add(new Patientcomplaint
+                    {
+                        ComplaintId = key,
+                        ConsultId = this.session.Id,
+                        PatientId = this.session.Patient.PatientId,
+                        PatientComplaintDate = complaintTime
+                    });
+            }
+            SessionObject session = new SessionObject
+                {
+                    Id = this.session.Id,
+                    Patient = this.session.Patient,
+                    ComplaintNotes = this.session.ComplaintNotes,
+                    Complaints = complaints,
+                    Prescriptions = this.Prescriptions
+                };
+            var responseMain = await Http.PutAsJsonAsync("api/staff/records/session", session);
+            if (responseMain.IsSuccessStatusCode)
+            {
+                notificationMessage.Detail = "Record Updated succesfully !!! ";
+                notificationMessage.Summary = "Session Update";
+                notificationMessage.Severity = NotificationSeverity.Success;
+                notificationMessage.Duration = 5000;
+
+                await ShowNotification(notificationMessage);
+                m_requiredReload = true;
+            }
+            else
+            {
+                notificationMessage.Detail = "An error occurred, please try again !!! ";
+                notificationMessage.Summary = "Error Occurred";
+                notificationMessage.Severity = NotificationSeverity.Error;
+                notificationMessage.Duration = 5000;
+
+                await ShowNotification(notificationMessage);
+
+                if (!m_requiredReload)
+                    m_requiredReload = false;
+            }
+        }
+    }
+    /// <summary>
+    /// Shows a notification message
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    async Task ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
 }
