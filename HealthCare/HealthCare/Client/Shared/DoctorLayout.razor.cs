@@ -19,6 +19,7 @@ namespace HealthCare.Client.Shared
                 var authHeader = new AuthenticationHeaderValue("Bearer", token);
                 Http.DefaultRequestHeaders.Authorization = authHeader;
             }
+
         }
 
         private async Task Logout()
