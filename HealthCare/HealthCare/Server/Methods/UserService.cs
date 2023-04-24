@@ -62,5 +62,39 @@ namespace HealthCare.Server.Methods
                 return null;
             }
         }
+
+
+        /// <summary>
+        /// Gets the lusers with their permissions
+        /// </summary>
+        /// <returns>List of users with their permission capabilities</returns>
+        public async Task<List<UserPermissions>> GetuserPermissions()
+        {
+            try
+            {
+                List<UserPermissions> userPermissionsList = new List<UserPermissions>();
+                var users = await m_context.Users.ToListAsync();
+                var permissions = await m_context.Permissions.ToListAsync();
+
+                foreach (var user in users)
+                {
+                    foreach (var permission in permissions)
+                    {
+                        if (permission.PermissionId == user.RoleId)
+                        {
+                            userPermissionsList.Add(new UserPermissions { Username = user.Username, Permission = permission.PermissionName });
+                        }
+                    }
+                }
+
+                return userPermissionsList;
+            }
+            catch (Exception ex)
+            {
+                m_logger.LogError(ex, $"Failed to get user permissions.");
+                return null;
+            }
+        }
+
     }
 }
