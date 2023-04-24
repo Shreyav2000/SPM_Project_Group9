@@ -56,5 +56,20 @@ namespace HealthCare.Server.Controllers
 
             return user;
         }
+
+
+        /// <summary>
+        /// Get users with their permissions
+        /// </summary>
+        [HttpGet("permissions")]
+        public async Task<ActionResult<List<UserPermissions>>> GetuserPermissions()
+        {
+            var userPermissions = await m_service.GetuserPermissions();
+            if (userPermissions == null)
+                return BadRequest($"Try again later");
+
+            return userPermissions;
+        }
+
     }
 }

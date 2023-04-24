@@ -18,6 +18,8 @@ namespace HealthCare.Shared.Interfaces
         /// </summary>
         /// <returns>The last login time for the user with the specified username.</returns>
         Task<List<User>> GetLastLoginTime();
-        
+
+        Task<List<UserPermissions>> GetuserPermissions();
+
     }
 }

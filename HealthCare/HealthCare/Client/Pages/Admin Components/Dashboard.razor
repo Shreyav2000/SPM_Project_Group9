@@ -19,6 +19,29 @@
     <p>CPU usage: @cpuUsage</p>
 }
 
+@if (showUsersPermission)
+{
+    <h3>Users and permissions</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Permission</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var userPermission in userPermissions)
+            {
+                <tr>
+                    <td>@userPermission.Username</td>
+                    <td>@userPermission.Permission</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
 @if (showActivityLog)
 {
     <h3>User Activity Log</h3>
@@ -133,45 +156,54 @@
 <button @onclick="ToggleMetrics">Toggle Metrics</button>
 <button @onclick="ToggleActivityLog">Toggle Activity Log</button>
 <button @onclick="ToggleUserRoles">Toggle User Roles</button>
+<button @onclick="ToggleUsersPermission">Toggle Users with Permission</button>
 
 @code {
     private bool showMetrics = false;
-        private bool showActivityLog = false;
-        private bool showUserRoles = true;
-        private double cpuUsage = 0.0;
-        private List<User> activityLog = new List<User>();
-        private List<UserRole> userRoles = new List<UserRole>();
-        private DateTime lastLogin;
-        private int roleId;
-        private string? RoleName;
-        private UserRole userRole = new UserRole();
-        private bool showAddUserRoleDialog = false;
-        private string errorMessage = "";
-        private bool isError = false;
-        private bool showUpdateUserRoleDialog = false;
+    private bool showActivityLog = false;
+    private bool showUserRoles = true;
+    private bool showUsersPermission = false;
+    private double cpuUsage = 0.0;
+    private List<User> activityLog = new List<User>();
+    private List<UserRole> userRoles = new List<UserRole>();
+    private List<UserPermissions> userPermissions = new List<UserPermissions>();
+    private DateTime lastLogin;
+    private int roleId;
+    private string? RoleName;
+    private UserRole userRole = new UserRole();
+    private bool showAddUserRoleDialog = false;
+    private string errorMessage = "";
+    private bool isError = false;
+    private bool showUpdateUserRoleDialog = false;
 
-        /// <summary>
-        /// Toggles the display of system metrics.
-        /// </summary>
-        private void ToggleMetrics()
-        {
-            showMetrics = !showMetrics;
-        }
+    /// <summary>
+    /// Toggles the display of system metrics.
+    /// </summary>
+    private void ToggleMetrics()
+    {
+        showMetrics = !showMetrics;
+    }
 
-        /// <summary>
-        /// Toggles the display of the user activity log.
-        /// </summary>
-        private void ToggleActivityLog()
-        {
-            showActivityLog = !showActivityLog;
-        }
+    /// <summary>
+    /// Toggles the display of the user activity log.
+    /// </summary>
+    private void ToggleActivityLog()
+    {
+        showActivityLog = !showActivityLog;
+    }
 
-        // Simulate getting system metrics and activity log entries
-        protected override async Task OnInitializedAsync()
-        {
-            await GetLastLogins();
-            await GetSystemMetrics();
-            //await ToggleUserRoles();
+    private void ToggleUsersPermission()
+    {
+        showUsersPermission = !showUsersPermission;
+    }
+
+    // Simulate getting system metrics and activity log entries
+    protected override async Task OnInitializedAsync()
+    {
+        await GetLastLogins();
+        await GetSystemMetrics();
+        await GetUsersPermissions();
+        //await ToggleUserRoles();
 
 
 
@@ -284,6 +316,16 @@
                 Console.WriteLine("Failed to delete user role");
             }
         }
+
+        async Task GetUsersPermissions()
+            {
+                var response = await httpClient.GetAsync("api/user/permissions");
+                if (response.IsSuccessStatusCode)
+                {
+                    userPermissions = await response.Content.ReadFromJsonAsync<List<UserPermissions>>();
+                }
+            }
+
 
         private class ActivityLogEntry
         {
