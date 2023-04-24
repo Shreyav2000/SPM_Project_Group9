@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -90,7 +91,10 @@ if (app.Environment.IsDevelopment())
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
-         c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyBlazor v1"));
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MyBlazor v1");
+        c.RoutePrefix = "api/docs";
+    });
 }
 else
 {
