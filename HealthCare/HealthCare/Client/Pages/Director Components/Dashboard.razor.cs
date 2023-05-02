@@ -14,17 +14,21 @@ namespace HealthCare.Client.Pages.Director_Components
     /// </summary>
     public partial class Dashboard
     {
+        //Define a partial class called dashboard
         List<UserConsults> UserConsultations { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
+            //Define a property to store user consultations
             UserConsultations = new List<UserConsults>();
             //if (Http.DefaultRequestHeaders == null)
             //{
+            //retrieve the authentication token from the string storage
                 string token = await sessionStorage.GetItemAsync<string>("token");
                 var authHeader = new AuthenticationHeaderValue("Bearer", token);
                 Http.DefaultRequestHeaders.Authorization = authHeader;
             //}
+            //call the get data method to retrieve user consultation data
             await getData();
         }
         async Task getData()
